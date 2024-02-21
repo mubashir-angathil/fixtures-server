@@ -8,14 +8,17 @@ datasource db {
 }
 
 model User {
-  id       String    @id @default(auto()) @map("_id") @db.ObjectId
-  username String    @unique
-  email    String    @unique
-  password String
-  isAdmin  Boolean   @default(false)
-  address  Address[]
-  Order    Order[]
-  Cart     Cart[]
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  username  String    @unique
+  email     String    @unique
+  password  String
+  dob       DateTime
+  roles     Roles[]   @default([Customer])
+  address   Address[]
+  Order     Order[]
+  Cart      Cart[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model Address {
@@ -68,7 +71,7 @@ model OrderItem {
 
 model Cart {
   id        String     @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String     @db.ObjectId @unique
+  userId    String     @unique @db.ObjectId
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   user      User       @relation(fields: [userId], references: [id])
@@ -77,7 +80,7 @@ model Cart {
 
 model CartItem {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  productId  String   @db.ObjectId @unique
+  productId  String   @unique @db.ObjectId
   quantity   Int
   totalPrice Float
   createdAt  DateTime @default(now())
@@ -86,8 +89,32 @@ model CartItem {
   cart       Cart     @relation(fields: [cartId], references: [id])
 }
 
+model Promotion {
+  id             String        @id @default(auto()) @map("_id") @db.ObjectId
+  url            String        @unique
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  validity       DateTime
+  discountAmount Float?
+  discountType   DiscountType?
+  promotionCode  String?
+  description    String?
+  isActive       Boolean?      @default(true)
+  usageLimit     Int?
+}
+
+enum DiscountType {
+  FIXED_AMOUNT
+  PERCENTAGE
+}
+
 enum Status {
   Pending
   Shipped
   Delivered
+}
+
+enum Roles {
+  Vendor
+  Customer
 }
