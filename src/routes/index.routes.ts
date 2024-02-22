@@ -1,12 +1,14 @@
 import { Router, Request, Response } from "express";
 import { Routes } from "../configs/interfaces/routes.interface";
 import { NODE_ENV } from "../configs/configs";
-import prisma from "../prisma/prisma";
+import tryCatchHandler from "../utils/tryCatchHandler";
+import IndexControllers from "../controllers/index.controllers";
 
-class IndexRoute implements Routes {
+class IndexRoute extends IndexControllers implements Routes {
     public path?: string = "";
     router: Router = Router();
     constructor() {
+        super();
         this.initializeRoutes();
     }
     private initializeRoutes() {
@@ -15,19 +17,9 @@ class IndexRoute implements Routes {
                 message: "Hello world🌏",
                 environment: NODE_ENV,
             });
-        }),
-            this.router.get(
-                "/promotions",
-                async (req: Request, res: Response) => {
-                    const promotions = await prisma.promotion.findMany();
-                    // console.log(promotions)
-                    res.status(200).json({
-                        success: true,
-                        message: "Promotions fetched successfully",
-                        data: promotions,
-                    });
-                }
-            );
+        });
+        this.router.post("/promotion/create", tryCatchHandler(this.createPromotionController));
+        this.router.get("/promotions", tryCatchHandler(this.getPromotionsController));
     }
 }
 

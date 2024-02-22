@@ -53,20 +53,22 @@ model Category {
 model Order {
   id         String      @id @default(auto()) @map("_id") @db.ObjectId
   userId     String      @db.ObjectId
+  toalAmount Int
   user       User        @relation(fields: [userId], references: [id])
   status     Status      @default(Pending)
-  toalAmount Int
   OrderItem  OrderItem[]
 }
 
 model OrderItem {
-  id        String  @id @default(auto()) @map("_id") @db.ObjectId
-  orderId   String  @db.ObjectId
-  productId String  @db.ObjectId
-  order     Order   @relation(fields: [orderId], references: [id])
-  product   Product @relation(fields: [productId], references: [id])
-  quantity  Int
-  unitPrice Int
+  id            String     @id @default(auto()) @map("_id") @db.ObjectId
+  orderId       String     @db.ObjectId
+  productId     String     @db.ObjectId
+  promotionCode String?
+  quantity      Int
+  unitPrice     Int
+  order         Order      @relation(fields: [orderId], references: [id])
+  product       Product    @relation(fields: [productId], references: [id])
+  promotion     Promotion? @relation(fields: [promotionCode], references: [promotionCode])
 }
 
 model Cart {
@@ -91,16 +93,17 @@ model CartItem {
 
 model Promotion {
   id             String        @id @default(auto()) @map("_id") @db.ObjectId
-  url            String        @unique
+  url            String
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
   validity       DateTime
   discountAmount Float?
   discountType   DiscountType?
-  promotionCode  String?
+  promotionCode  String?        @unique
   description    String?
   isActive       Boolean?      @default(true)
   usageLimit     Int?
+  OrderItem      OrderItem[]
 }
 
 enum DiscountType {

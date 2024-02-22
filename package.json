@@ -21,7 +21,6 @@
     "author": "Mubashir Angathil",
     "license": "ISC",
     "dependencies": {
-        "@prisma/client": "^5.11.0",
         "bcrypt": "^5.1.1",
         "class-transformer": "^0.5.1",
         "class-validator": "^0.14.1",
@@ -36,7 +35,7 @@
         "typescript": "^5.3.3"
     },
     "devDependencies": {
-        "@prisma/client": "^5.10.0",
+        "@prisma/client": "^5.10.2",
         "@types/bcrypt": "^5.0.2",
         "@types/compression": "^1.7.5",
         "@types/cors": "^2.8.17",
