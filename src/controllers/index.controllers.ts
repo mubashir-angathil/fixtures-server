@@ -4,15 +4,6 @@ import services from "../services/services";
 
 class IndexControllers {
     private services = services;
-    public createPromotionController = async (req: Request, res: Response) => {
-        const promotion = await this.services.indexServices.createPromotion(req.body);
-
-        res.status(HTTP_STATUS_CODES.CREATED).json({
-            success: true,
-            message: "Promotion created successfully",
-            data: promotion
-        });
-    };
 
     public getPromotionsController = async (req: Request, res: Response) => {
         const promotions = await this.services.indexServices.getPromotions();

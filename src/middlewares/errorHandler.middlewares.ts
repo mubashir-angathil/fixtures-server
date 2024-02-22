@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import HttpException from "../configs/exceptions/HttpException";
 import { HTTP_STATUS_CODES } from "../configs/constants/statusCode.constants";
 
-class ErrorHandlerMiddleWare {
+class ErrorMiddleware {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     public errorHandler = (
         {
@@ -10,11 +10,12 @@ class ErrorHandlerMiddleWare {
             message,
             ...reset
         }: HttpException,
-        req: Request,
+        _req: Request,
         res: Response,
-        next: NextFunction
+        // eslint-disable-next-line no-unused-vars
+        _next: NextFunction
     ) => {
         throw new HttpException(status, message, reset, res);
     };
 }
-export default ErrorHandlerMiddleWare;
+export default ErrorMiddleware;

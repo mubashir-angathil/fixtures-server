@@ -13,7 +13,7 @@ model User {
   email     String    @unique
   password  String
   dob       DateTime
-  roles     Roles[]   @default([Customer])
+  role      Roles     @default(Customer)
   address   Address[]
   Order     Order[]
   Cart      Cart[]
@@ -99,7 +99,7 @@ model Promotion {
   validity       DateTime
   discountAmount Float?
   discountType   DiscountType?
-  promotionCode  String?        @unique
+  promotionCode  String?       @unique
   description    String?
   isActive       Boolean?      @default(true)
   usageLimit     Int?

@@ -6,7 +6,7 @@ export interface CreateUserInterface {
     email: string;
     password: string;
     dob?: Date;
-    roles: $Enums.Roles[];
+    role: $Enums.Roles;
     createdAt: Date;
     updatedAt: Date;
 }

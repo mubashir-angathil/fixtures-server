@@ -10,14 +10,14 @@ class AuthServices {
         username,
         email,
         password,
-        roles,
+        role,
         dob,
     }: DoSignUpInterface) => {
         try {
             const hashedPassword =
                 await this.passwordHelper.hashPassword(password);
             const user = await prisma.user.create({
-                data: { username, email, password: hashedPassword, roles, dob },
+                data: { username, email, password: hashedPassword, role, dob },
             });
 
             if (!user) {
@@ -44,7 +44,7 @@ class AuthServices {
                     email: true,
                     username: true,
                     password: true,
-                    roles: true,
+                    role: true,
                     createdAt: true,
                     updatedAt: true,
                 },
@@ -65,6 +65,18 @@ class AuthServices {
             }
 
             return user;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    public async findUserById({ userId }: { userId: string }) {
+        try {
+            return await prisma.user.findUnique({
+                where: {
+                    id: userId
+                }
+            })
         } catch (error) {
             throw error;
         }

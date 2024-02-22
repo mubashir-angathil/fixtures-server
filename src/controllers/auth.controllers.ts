@@ -14,7 +14,7 @@ class AuthControllers {
         const user: CreateUserInterface =
             await this.services.authServices.doSignUp({
                 ...req.body,
-                roles: ["Vendor"],
+                role: "Vendor",
             });
         this.attachAuthTokens(
             req,
@@ -24,16 +24,14 @@ class AuthControllers {
             next
         );
     };
+
     public userSignUp = async (
         req: Request,
         res: Response,
         next: NextFunction
     ) => {
         const user: CreateUserInterface =
-            await this.services.authServices.doSignUp({
-                ...req.body,
-                roles: ["Customer"],
-            });
+            await this.services.authServices.doSignUp(req.body);
         this.attachAuthTokens(
             req,
             res,
@@ -42,6 +40,7 @@ class AuthControllers {
             next
         );
     };
+
     public adminSignIn = async (
         req: Request,
         res: Response,
@@ -51,6 +50,7 @@ class AuthControllers {
             await this.services.authServices.doSignIn(req.body);
         this.attachAuthTokens(req, res, user, "Welcome back!", next);
     };
+    
     public userSignIn = async (
         req: Request,
         res: Response,
@@ -74,6 +74,7 @@ class AuthControllers {
                     id: user.id,
                     email: user.email,
                     username: user.username,
+                    roles: user.role
                 },
                 "5d"
             ),
@@ -81,6 +82,7 @@ class AuthControllers {
                 id: user.id,
                 email: user.email,
                 username: user.username,
+                roles: user.role
             }),
         ]);
 

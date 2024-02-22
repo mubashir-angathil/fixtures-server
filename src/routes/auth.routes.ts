@@ -1,16 +1,17 @@
 import { Router } from "express";
 import { Routes } from "../configs/interfaces/routes.interface";
 import AuthControllers from "../controllers/auth.controllers";
-import { bodyValidationMiddleware } from "../middlewares/validation.middlewares";
 import {
     CreateUserDto,
     UserSignInDto,
 } from "../configs/dtos/request/auth.request.dto";
 import tryCatchHandler from "../utils/tryCatchHandler";
+import middlewares from "../middlewares/middlewares";
 
 class AuthRoute extends AuthControllers implements Routes {
     path: string = "/auth";
     router: Router = Router();
+    private middlewares = middlewares;
 
     constructor() {
         super();
@@ -19,22 +20,22 @@ class AuthRoute extends AuthControllers implements Routes {
     private initializeRoutes() {
         this.router.post(
             "/sign-up/admin",
-            bodyValidationMiddleware(CreateUserDto),
+            this.middlewares.validationMiddleware.bodyValidationMiddleware(CreateUserDto),
             tryCatchHandler(this.adminSignUp)
         );
         this.router.post(
             "/sign-up",
-            bodyValidationMiddleware(CreateUserDto),
+            this.middlewares.validationMiddleware.bodyValidationMiddleware(CreateUserDto),
             tryCatchHandler(this.userSignUp)
         );
         this.router.post(
             "/sign-in/admin",
-            bodyValidationMiddleware(UserSignInDto),
+            this.middlewares.validationMiddleware.bodyValidationMiddleware(UserSignInDto),
             tryCatchHandler(this.adminSignIn)
         );
         this.router.post(
             "/sign-in",
-            bodyValidationMiddleware(UserSignInDto),
+            this.middlewares.validationMiddleware.bodyValidationMiddleware(UserSignInDto),
             tryCatchHandler(this.userSignIn)
         );
     }
