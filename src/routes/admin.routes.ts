@@ -19,7 +19,10 @@ class AdminRoute extends AdminController implements Routes {
             this.middlewares.authMiddleware.verifyToken,
             this.middlewares.authMiddleware.validateAdminRole,
             tryCatchHandler(this.createPromotionController));
-
+        this.router.post("/product/create",
+            this.middlewares.authMiddleware.verifyToken,
+            this.middlewares.authMiddleware.validateAdminRole,
+            tryCatchHandler(this.createProductController));
     }
 }
 

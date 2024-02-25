@@ -19,6 +19,7 @@ model User {
   Cart      Cart[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+  Product   Product[]
 }
 
 model Address {
@@ -33,21 +34,25 @@ model Address {
 }
 
 model Product {
-  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   description String
   price       Int
   image       String[]
-  categoryId  String      @unique @db.ObjectId
-  category    Category[]
-  OrderItem   OrderItem[]
+  categoryId  String   @db.ObjectId
+  vendorId    String   @db.ObjectId
+  category    Category @relation(fields: [categoryId], references: [id])
+  vendor      User     @relation(fields: [vendorId], references: [id])
+  // OrderItem   OrderItem[]
 }
 
 model Category {
-  id        String  @id @default(auto()) @map("_id") @db.ObjectId
-  name      String
-  productId String  @db.ObjectId
-  product   Product @relation(fields: [productId], references: [id])
+  id      String    @id @default(auto()) @map("_id") @db.ObjectId
+  name    String    @unique
+  // productId String  @db.ObjectId
+  // product   Product @relation(fields: [productId], references: [id])
+  // Product Product?
+  Product Product[]
 }
 
 model Order {
@@ -67,7 +72,7 @@ model OrderItem {
   quantity      Int
   unitPrice     Int
   order         Order      @relation(fields: [orderId], references: [id])
-  product       Product    @relation(fields: [productId], references: [id])
+  // product       Product    @relation(fields: [productId], references: [id])
   promotion     Promotion? @relation(fields: [promotionCode], references: [promotionCode])
 }
 
