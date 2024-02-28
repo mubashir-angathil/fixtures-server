@@ -3,6 +3,7 @@ import { Routes } from "../configs/interfaces/routes.interface";
 import middlewares from "../middlewares/middlewares";
 import tryCatchHandler from "../utils/tryCatchHandler";
 import AdminController from "../controllers/admin.controllers";
+import { CreateProductDto, UpdateProductDto } from "../configs/dtos/request/admin.request.dto";
 
 class AdminRoute extends AdminController implements Routes {
     path?: string | undefined = '/admin';
@@ -19,10 +20,20 @@ class AdminRoute extends AdminController implements Routes {
             this.middlewares.authMiddleware.verifyToken,
             this.middlewares.authMiddleware.validateAdminRole,
             tryCatchHandler(this.createPromotionController));
+
+
         this.router.post("/product/create",
             this.middlewares.authMiddleware.verifyToken,
             this.middlewares.authMiddleware.validateAdminRole,
+            this.middlewares.validationMiddleware.bodyValidationMiddleware(CreateProductDto),
             tryCatchHandler(this.createProductController));
+
+        this.router.patch("/product/:productId/update",
+            this.middlewares.authMiddleware.verifyToken,
+            this.middlewares.authMiddleware.validateAdminRole,
+            this.middlewares.validationMiddleware.bodyValidationMiddleware(UpdateProductDto),
+            tryCatchHandler(this.updateProductController));
+
     }
 }
 

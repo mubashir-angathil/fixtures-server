@@ -20,13 +20,31 @@ class AdminController {
         const vendorId = req.user?.id
 
         if (!vendorId) throw next({ message: "authorId is missing!" })
-        
+
         const product = await this.services.productServices.createProduct(req.body, vendorId)
         res.status(HTTP_STATUS_CODES.CREATED).json({
             success: true,
             message: "Product created successfully",
             data: product
         });
-    }
+    };
+
+    public updateProductController = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+        const vendorId = req.user?.id
+        const productId = req.params?.productId
+
+        if (!vendorId) throw next({ message: "authorId is missing!" })
+        if (!productId) throw next({ message: "productId is missing!" })
+
+
+        const newProduct = await this.services.productServices.updateProduct(req.body, productId, vendorId)
+
+        res.status(HTTP_STATUS_CODES.OK).json({
+            success: true,
+            message: "Product details updated successfully!!",
+            data: newProduct
+        })
+    };
+
 }
 export default AdminController

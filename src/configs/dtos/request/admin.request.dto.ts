@@ -1,4 +1,5 @@
-import { IsArray, IsEmpty, IsInt, IsNotEmpty, IsString } from "class-validator"
+import { $Enums, Photo, Product } from "@prisma/client";
+import { IsArray, IsInt, IsNotEmpty, IsOptional, IsString } from "class-validator"
 
 export class CreateProductDto {
     @IsString()
@@ -6,26 +7,95 @@ export class CreateProductDto {
     name: string;
 
     @IsString()
-    @IsEmpty()
+    @IsNotEmpty()
     description: string;
 
     @IsInt()
     @IsNotEmpty()
-    price: number;
+    quantity: number
+
+    @IsInt()
+    @IsNotEmpty()
+    price: Product['price'];
 
     @IsArray()
-    @IsEmpty()
-    image: string[];
+    @IsNotEmpty()
+    photos: Photo[];
 
     @IsString()
-    @IsEmpty()
+    @IsNotEmpty()
     categoryId: string;
 
-    constructor(name: string, description: string, price: number, image: string[], categoryId: string, vendorId: string) {
+    @IsArray()
+    @IsNotEmpty()
+    colors: $Enums.Color[]
+
+    @IsArray()
+    @IsNotEmpty()
+    sizes: $Enums.Size[]
+
+    constructor(
+        name: string,
+        description: string,
+        price: number,
+        quantity: number,
+        photos: Photo[],
+        categoryId: string,
+        colors: $Enums.Color[],
+        sizes: $Enums.Size[]
+    ) {
         this.name = name;
         this.description = description;
         this.price = price;
-        this.image = image;
+        this.quantity = quantity
+        this.photos = photos;
         this.categoryId = categoryId
+        this.colors = colors
+        this.sizes = sizes
+    }
+}
+
+export class UpdateProductDto {
+    @IsString()
+    @IsOptional()
+    name: string;
+
+    @IsString()
+    @IsOptional()
+    description: string;
+
+    @IsInt()
+    @IsOptional()
+    price: Product['price'];
+
+    @IsInt()
+    @IsOptional()
+    quantity: number
+
+    @IsString()
+    @IsOptional()
+    categoryId: string;
+
+    @IsArray()
+    @IsOptional()
+    photos: Photo[];
+
+    @IsArray()
+    @IsOptional()
+    colors: $Enums.Color[]
+
+    @IsArray()
+    @IsOptional()
+    sizes: $Enums.Size[]
+
+    constructor(name: string, description: string, price: number, quantity: number, photos: Photo[], categoryId: string, colors: $Enums.Color[], sizes: $Enums.Size[]) {
+        this.name = name;
+        this.description = description;
+        this.price = price;
+        this.quantity = quantity;
+        this.categoryId = categoryId
+        this.photos = photos;
+        this.colors = colors;
+        this.sizes = sizes;
     }
 }

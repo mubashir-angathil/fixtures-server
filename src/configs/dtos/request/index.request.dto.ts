@@ -1,4 +1,4 @@
-import { IsDateString, IsString, IsUrl } from "class-validator";
+import { IsDateString, IsInt, IsNotEmpty, IsNumber, IsString, IsUrl } from "class-validator";
 
 export class CreatePromotionDto {
     @IsString()
@@ -12,5 +12,20 @@ export class CreatePromotionDto {
     constructor(url: string, validity: string) {
         this.url = url;
         this.validity = validity;
+    }
+}
+
+export class PaginationDto {
+    @IsString()
+    @IsNotEmpty()
+    page: string
+
+    @IsString()
+    @IsNotEmpty()
+    limit: string
+
+    constructor(limit: string, page: string) {
+        this.page = page
+        this.limit = limit
     }
 }

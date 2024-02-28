@@ -31,19 +31,24 @@ model Address {
   phoneNumber  String?
   userId       String  @unique @db.ObjectId
   user         User    @relation(fields: [userId], references: [id])
+  Order        Order[]
 }
 
 model Product {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   description String
-  price       Int
-  image       String[]
-  categoryId  String   @db.ObjectId
-  vendorId    String   @db.ObjectId
-  category    Category @relation(fields: [categoryId], references: [id])
-  vendor      User     @relation(fields: [vendorId], references: [id])
-  // OrderItem   OrderItem[]
+  price       Float
+  categoryId  String      @db.ObjectId
+  vendorId    String      @db.ObjectId
+  quantity    Int
+  category    Category    @relation(fields: [categoryId], references: [id])
+  vendor      User        @relation(fields: [vendorId], references: [id])
+  orders      Order[]
+  colors      Color[]
+  sizes       Size[]
+  photos      Photo[]
+  OrderItem   OrderItem[]
 }
 
 model Category {
@@ -57,11 +62,17 @@ model Category {
 
 model Order {
   id         String      @id @default(auto()) @map("_id") @db.ObjectId
+  color      Color
+  size       Size
   userId     String      @db.ObjectId
-  toalAmount Int
+  toalAmount Float
   user       User        @relation(fields: [userId], references: [id])
   status     Status      @default(Pending)
   OrderItem  OrderItem[]
+  Product    Product?    @relation(fields: [productId], references: [id])
+  productId  String?     @db.ObjectId
+  addressId  String      @db.ObjectId
+  Address    Address     @relation(fields: [addressId], references: [id])
 }
 
 model OrderItem {
@@ -72,7 +83,7 @@ model OrderItem {
   quantity      Int
   unitPrice     Int
   order         Order      @relation(fields: [orderId], references: [id])
-  // product       Product    @relation(fields: [productId], references: [id])
+  product       Product    @relation(fields: [productId], references: [id])
   promotion     Promotion? @relation(fields: [promotionCode], references: [promotionCode])
 }
 
@@ -125,4 +136,23 @@ enum Status {
 enum Roles {
   Vendor
   Customer
+}
+
+enum Color {
+  Red
+  Green
+  Blue
+}
+
+enum Size {
+  Small
+  Medium
+  Large
+  XLarge
+}
+
+type Photo {
+  height Int    @default(200)
+  width  Int    @default(100)
+  url    String
 }

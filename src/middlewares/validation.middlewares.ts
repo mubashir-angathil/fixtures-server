@@ -1,6 +1,6 @@
 import { validate, ValidationError } from "class-validator";
 import { plainToInstance } from "class-transformer";
-import { RequestHandler } from "express";
+import { NextFunction, RequestHandler } from "express";
 import { HTTP_STATUS_CODES } from "../configs/constants/statusCode.constants";
 
 class ValidationMiddleware {
@@ -32,6 +32,33 @@ class ValidationMiddleware {
                 .catch((err) => next(err));
         };
 
+
+    public queryValidationMiddleware = (
+        type: any,
+        skipMissingProperties = false,
+        whitelist = true,
+        forbidNonWhitelisted = true
+    ): RequestHandler => (req, res, next) => {
+        console.log(req.query)
+        validate(plainToInstance(type, req.query), {
+            skipMissingProperties,
+            whitelist,
+            forbidNonWhitelisted
+        })
+            .then((errors: ValidationError[]) => {
+                if (errors.length > 0) {
+                    if (errors.length > 0) {
+                        throw next({
+                            status: HTTP_STATUS_CODES.BAD_REQUEST,
+                            message: "Query Validation Failed!!!",
+                            error: this.errorFormatter(errors),
+                        });
+                    }
+                }
+                next();
+            }).catch((err) => next(err));
+
+    }
     private errorFormatter = (
         errors: ValidationError[],
         errMessage: { [key: string]: string } = {},

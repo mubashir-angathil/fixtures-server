@@ -1,4 +1,4 @@
-import { UserSignInDto } from "../configs/dtos/request/auth.request.dto";
+import { UserSignInDto } from "../configs/dtos/response/auth.request.dto";
 import { DoSignUpInterface } from "../configs/interfaces/common.interfaces";
 import prisma from "../prisma/prisma";
 import PasswordHelpers from "../utils/passwordHelpers";

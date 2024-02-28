@@ -1,12 +1,9 @@
 import { Router } from "express";
 import { Routes } from "../configs/interfaces/routes.interface";
 import AuthControllers from "../controllers/auth.controllers";
-import {
-    CreateUserDto,
-    UserSignInDto,
-} from "../configs/dtos/request/auth.request.dto";
 import tryCatchHandler from "../utils/tryCatchHandler";
 import middlewares from "../middlewares/middlewares";
+import { CreateUserDto, UserSignInDto } from "../configs/dtos/response/auth.request.dto";
 
 class AuthRoute extends AuthControllers implements Routes {
     path: string = "/auth";
