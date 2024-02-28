@@ -58,6 +58,19 @@ class ProductServices {
         }
     };
 
+    public deleteProduct = async (productId: string, vendorId: string) => {
+        try {
+            return await prisma.product.delete({
+                where: {
+                    id: productId,
+                    vendorId
+                }
+            })
+        } catch (error) {
+            throw error
+        }
+    }
+    
     private checkIsIdExist = async (id: string, model: any, message: string) => {
         try {
             const isIdExist = await model.findUnique({ where: { id } })

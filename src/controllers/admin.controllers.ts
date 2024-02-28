@@ -46,5 +46,22 @@ class AdminController {
         })
     };
 
+    public deleteProductController = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+        const vendorId = req.user?.id
+        const productId = req.params?.productId
+
+        if (!vendorId) throw next({ message: "authorId is missing!" })
+        if (!productId) throw next({ message: "productId is missing!" })
+
+
+        const newProduct = await this.services.productServices.deleteProduct(productId, vendorId)
+
+        if (!newProduct) throw next({ message: "Product deletion failed!!" });
+
+        res.status(HTTP_STATUS_CODES.OK).json({
+            success: true,
+            message: "Product deletion successful!!",
+        })
+    }
 }
 export default AdminController

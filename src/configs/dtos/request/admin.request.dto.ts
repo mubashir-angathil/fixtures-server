@@ -99,3 +99,13 @@ export class UpdateProductDto {
         this.sizes = sizes;
     }
 }
+
+export class DeleteProductDto {
+    @IsString()
+    @IsNotEmpty()
+    productId: string
+
+    constructor(productId: string) {
+        this.productId = productId
+    }
+}
