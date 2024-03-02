@@ -7,7 +7,7 @@ import { RequestWithUser } from "../configs/interfaces/common.interfaces";
 
 class AuthMiddleware extends JwtHelper {
     private services = services
-    
+
     public verifyToken = async (req: RequestWithUser, _res: Response, next: NextFunction) => {
         const authToken = req.headers.authorization;
         try {
@@ -46,6 +46,21 @@ class AuthMiddleware extends JwtHelper {
             else {
                 const user = await this.services.authServices.findUserById({ userId: req.user?.id })
                 if (user?.role === 'Vendor') next()
+                else next({ status: HTTP_STATUS_CODES.FORBIDDEN, message: "Forbidden operation" })
+
+            }
+
+        } catch (error) {
+            next({ status: HTTP_STATUS_CODES.UNAUTHORIZED, message: "Forbidden operation", error })
+        }
+    }
+
+    public validateUserRole = async (req: RequestWithUser, _res: Response, next: NextFunction) => {
+        try {
+            if (!req.user) throw next({ status: HTTP_STATUS_CODES.FORBIDDEN, message: "Forbidden operation" })
+            else {
+                const user = await this.services.authServices.findUserById({ userId: req.user?.id })
+                if (user?.role === 'Customer') next()
                 else next({ status: HTTP_STATUS_CODES.FORBIDDEN, message: "Forbidden operation" })
 
             }

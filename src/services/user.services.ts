@@ -1,10 +1,13 @@
+import { RemoveProductFromCartDto } from "../configs/dtos/request/user.request.dto";
 import prisma from "../prisma/prisma"
 
 class UserServices {
     public addProductToCart = async ({ userId, productId, quantity }: { userId: string, productId: string, quantity: number }) => {
         const transaction = await prisma.$transaction(async (prisma) => {
             // Find or create the cart
-            let cart = await prisma.cart.findUnique({ where: { userId } });
+            let cart = await prisma.cart.findUnique({
+                where: { userId }
+            });
 
             if (!cart) {
                 cart = await prisma.cart.create({
@@ -33,17 +36,36 @@ class UserServices {
                 }
             });
 
-            if (quantity !== item.quantity) {
+            if (item.quantity <= 0) {
+                await prisma.cartItem.delete({
+                    where: {
+                        cartIdProductId: { cartId: cart.id, productId }
+                    }
+                })
+                return { cart, deleted: true }
+            } else if (quantity !== item.quantity) {
                 await prisma.cartItem.update({
                     where: { id: item.id },
                     data: { totalPrice: await this.calculateTotalProductPrice(productId, item.quantity) }
                 })
             }
 
-            return cart;
+            return { cart };
         });
 
         return transaction;
+    }
+
+    public removeProductFromCart = async ({ productId, cartId }: RemoveProductFromCartDto) => {
+        try {
+            return await prisma.cartItem.delete({
+                where: {
+                    cartIdProductId: { cartId, productId },
+                }
+            })
+        } catch (error) {
+            throw error
+        }
     }
 
     private calculateTotalProductPrice = async (productId: string, quantity: number): Promise<number> => {

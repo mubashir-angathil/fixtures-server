@@ -11,12 +11,28 @@ class UserController {
 
         if (!userId) throw next({ message: "User id is missing!" })
 
-        const cart = await this.services.userServices.addProductToCart({ ...req.body, userId: userId })
+        const { cart, deleted } = await this.services.userServices.addProductToCart({ ...req.body, userId: userId })
+
+        res.status(HTTP_STATUS_CODES.CREATED).json({
+            success: true,
+            message: deleted
+                ? "Product successfully removed from cart"
+                : "Product successfully added to cart",
+            data: cart
+        })
+    }
+
+    public removeProductFromCartController = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+        const cart = await this.services.userServices.removeProductFromCart({
+            productId: req.params.productId,
+            cartId: req.params.cartId
+        })
+
+        if (!cart) throw next({ message: "Operation Failed!!, Failed to remove product from cart" })
 
         res.status(HTTP_STATUS_CODES.OK).json({
             success: true,
-            message: "",
-            data: cart
+            message: "Product successfully removed from cart"
         })
     }
 }

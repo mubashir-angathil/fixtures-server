@@ -14,3 +14,19 @@ export class AddProductToCartDto {
         this.quantity = quantity
     }
 }
+
+export class RemoveProductFromCartDto {
+    @IsString()
+    @IsNotEmpty()
+    cartId: string
+
+    @IsString()
+    @IsNotEmpty()
+    productId: string
+
+
+    constructor(cartId: string, productId: string) {
+        this.cartId = cartId
+        this.productId = productId
+    }
+}
