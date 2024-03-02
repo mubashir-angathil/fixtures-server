@@ -16,6 +16,12 @@ class UserRoute extends UserController implements Routes {
     }
 
     private initializeRoutes = () => {
+        this.router.get(
+            "/cart",
+            this.middlewares.authMiddleware.verifyToken,
+            this.middlewares.authMiddleware.validateUserRole,
+            tryCatchHandler(this.getUserCartController));
+
         this.router.post(
             "/cart/add",
             this.middlewares.authMiddleware.verifyToken,
@@ -28,9 +34,7 @@ class UserRoute extends UserController implements Routes {
             this.middlewares.authMiddleware.verifyToken,
             this.middlewares.authMiddleware.validateUserRole,
             this.middlewares.validationMiddleware.paramsValidationMiddleware(RemoveProductFromCartDto),
-            tryCatchHandler(this.removeProductFromCartController)
-
-        )
+            tryCatchHandler(this.removeProductFromCartController));
     }
 }
 

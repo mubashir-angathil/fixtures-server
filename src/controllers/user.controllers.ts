@@ -35,6 +35,22 @@ class UserController {
             message: "Product successfully removed from cart"
         })
     }
+
+    public getUserCartController = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+        const userId = req.user?.id
+
+        if (!userId) throw next({ message: "User id is missing!" })
+
+        const cart = await this.services.userServices.getUserCart({ userId })
+
+        if (!cart) throw next({ message: "Cart is empty!!" })
+
+        res.status(HTTP_STATUS_CODES.OK).json({
+            success: true,
+            message: "Cart details successfully fetched",
+            data: cart
+        })
+    }
 }
 
 export default UserController

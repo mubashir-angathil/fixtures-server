@@ -68,6 +68,23 @@ class UserServices {
         }
     }
 
+    public getUserCart = async ({ userId }: { userId: string }) => {
+        try {
+            return await prisma.cart.findUnique({
+                where: { userId },
+                select: {
+                    id: true,
+                    userId: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    items: true
+                }
+            })
+        } catch (error) {
+            throw error
+        }
+    }
+
     private calculateTotalProductPrice = async (productId: string, quantity: number): Promise<number> => {
         try {
             const product = await prisma.product.findUnique({ where: { id: productId } })
