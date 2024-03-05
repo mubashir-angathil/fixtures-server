@@ -23,15 +23,20 @@ model User {
 }
 
 model Address {
-  id           String  @id @default(auto()) @map("_id") @db.ObjectId
-  addressLine1 String
-  addressLine2 String
-  post         String
-  pin          String
-  phoneNumber  String?
-  userId       String  @unique @db.ObjectId
-  user         User    @relation(fields: [userId], references: [id])
-  Order        Order[]
+  id                     String       @id @default(auto()) @map("_id") @db.ObjectId
+  name                   String
+  phone                  String
+  pinCode                Int
+  locality               String
+  address                String
+  cityDistrictTown       String
+  state                  String
+  alternativePhoneNumber String?
+  landmark               String?
+  addressType            AddressType? @default(Home)
+  User                   User         @relation(fields: [userId], references: [id])
+  userId                 String       @db.ObjectId
+  Orders                 Order[]
 }
 
 model Product {
@@ -44,7 +49,6 @@ model Product {
   quantity    Int
   category    Category    @relation(fields: [categoryId], references: [id])
   vendor      User        @relation(fields: [vendorId], references: [id])
-  orders      Order[]
   colors      Color[]
   sizes       Size[]
   photos      Photo[]
@@ -58,33 +62,6 @@ model Category {
   // product   Product @relation(fields: [productId], references: [id])
   // Product Product?
   Product Product[]
-}
-
-model Order {
-  id         String      @id @default(auto()) @map("_id") @db.ObjectId
-  color      Color
-  size       Size
-  userId     String      @db.ObjectId
-  toalAmount Float
-  user       User        @relation(fields: [userId], references: [id])
-  status     Status      @default(Pending)
-  OrderItem  OrderItem[]
-  Product    Product?    @relation(fields: [productId], references: [id])
-  productId  String?     @db.ObjectId
-  addressId  String      @db.ObjectId
-  Address    Address     @relation(fields: [addressId], references: [id])
-}
-
-model OrderItem {
-  id            String     @id @default(auto()) @map("_id") @db.ObjectId
-  orderId       String     @db.ObjectId
-  productId     String     @db.ObjectId
-  promotionCode String?
-  quantity      Int
-  unitPrice     Int
-  order         Order      @relation(fields: [orderId], references: [id])
-  product       Product    @relation(fields: [productId], references: [id])
-  promotion     Promotion? @relation(fields: [promotionCode], references: [promotionCode])
 }
 
 model Cart {
@@ -107,6 +84,33 @@ model CartItem {
   cart       Cart     @relation(fields: [cartId], references: [id])
 
   @@unique(name: "cartIdProductId", fields: [cartId, productId])
+}
+
+model Order {
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String      @db.ObjectId
+  totalAmount Float
+  status      Status      @default(Pending)
+  cancelled   Boolean     @default(false)
+  user        User        @relation(fields: [userId], references: [id])
+  address     Address     @relation(fields: [addressId], references: [id])
+  addressId   String      @db.ObjectId
+  items       OrderItem[]
+}
+
+model OrderItem {
+  id            String     @id @default(auto()) @map("_id") @db.ObjectId
+  orderId       String     @db.ObjectId
+  productId     String     @db.ObjectId
+  promotionCode String?
+  quantity      Int
+  unitPrice     Float
+  color         Color
+  size          Size
+  cancelled     Boolean    @default(false)
+  order         Order      @relation(fields: [orderId], references: [id])
+  product       Product    @relation(fields: [productId], references: [id])
+  promotion     Promotion? @relation(fields: [promotionCode], references: [promotionCode])
 }
 
 model Promotion {
@@ -151,6 +155,11 @@ enum Size {
   Medium
   Large
   XLarge
+}
+
+enum AddressType {
+  Home
+  Work
 }
 
 type Photo {

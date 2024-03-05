@@ -3,7 +3,7 @@ import { Routes } from "../configs/interfaces/routes.interface";
 import middlewares from "../middlewares/middlewares";
 import tryCatchHandler from "../utils/tryCatchHandler";
 import UserController from "../controllers/user.controllers";
-import { AddProductToCartDto, RemoveProductFromCartDto } from "../configs/dtos/request/user.request.dto";
+import { AddProductToCartDto, CancelOrderDto, CreateAddressDto, PlaceOrderDto, RemoveProductFromCartDto, UpdateAddressDto, UpdateAddressParamsDto } from "../configs/dtos/request/user.request.dto";
 
 class UserRoute extends UserController implements Routes {
     path?: string = "/user"
@@ -35,6 +35,46 @@ class UserRoute extends UserController implements Routes {
             this.middlewares.authMiddleware.validateUserRole,
             this.middlewares.validationMiddleware.paramsValidationMiddleware(RemoveProductFromCartDto),
             tryCatchHandler(this.removeProductFromCartController));
+
+        this.router.post(
+            "/order/place",
+            this.middlewares.authMiddleware.verifyToken,
+            this.middlewares.authMiddleware.validateUserRole,
+            this.middlewares.validationMiddleware.bodyValidationMiddleware(PlaceOrderDto),
+            tryCatchHandler(this.placeOrderController)
+        );
+
+        this.router.get(
+            "/order/:orderId/cancel",
+            this.middlewares.authMiddleware.verifyToken,
+            this.middlewares.authMiddleware.validateUserRole,
+            this.middlewares.validationMiddleware.paramsValidationMiddleware(CancelOrderDto),
+            tryCatchHandler(this.cancelOrderController)
+        );
+
+        this.router.get(
+            "/orders",
+            this.middlewares.authMiddleware.verifyToken,
+            this.middlewares.authMiddleware.validateUserRole,
+            tryCatchHandler(this.getOrdersController)
+        );
+
+        this.router.post(
+            "/address/create",
+            this.middlewares.authMiddleware.verifyToken,
+            this.middlewares.authMiddleware.validateUserRole,
+            this.middlewares.validationMiddleware.bodyValidationMiddleware(CreateAddressDto),
+            tryCatchHandler(this.createAddressController)
+        );
+
+        this.router.patch(
+            "/address/:addressId/update",
+            this.middlewares.authMiddleware.verifyToken,
+            this.middlewares.authMiddleware.validateUserRole,
+            this.middlewares.validationMiddleware.paramsValidationMiddleware(UpdateAddressParamsDto),
+            this.middlewares.validationMiddleware.bodyValidationMiddleware(UpdateAddressDto),
+            tryCatchHandler(this.updateAddressController)
+        );
     }
 }
 

@@ -3,7 +3,7 @@ import { Routes } from "../configs/interfaces/routes.interface";
 import middlewares from "../middlewares/middlewares";
 import tryCatchHandler from "../utils/tryCatchHandler";
 import AdminController from "../controllers/admin.controllers";
-import { CreateProductDto, DeleteProductDto, UpdateProductDto } from "../configs/dtos/request/admin.request.dto";
+import { CreateProductDto, DeleteProductDto, UpdateOrderStatusDto, UpdateOrderStatusPramsDto, UpdateProductDto } from "../configs/dtos/request/admin.request.dto";
 
 class AdminRoute extends AdminController implements Routes {
     path?: string | undefined = '/admin';
@@ -39,6 +39,13 @@ class AdminRoute extends AdminController implements Routes {
             this.middlewares.authMiddleware.validateAdminRole,
             this.middlewares.validationMiddleware.paramsValidationMiddleware(DeleteProductDto),
             tryCatchHandler(this.deleteProductController));
+
+        this.router.get("/order/:orderId/update",
+            this.middlewares.authMiddleware.verifyToken,
+            this.middlewares.authMiddleware.validateAdminRole,
+            this.middlewares.validationMiddleware.paramsValidationMiddleware(UpdateOrderStatusPramsDto),
+            this.middlewares.validationMiddleware.queryValidationMiddleware(UpdateOrderStatusDto),
+            tryCatchHandler(this.updateOrderStatusController));
 
     }
 }

@@ -2,6 +2,7 @@ import { validate, ValidationError } from "class-validator";
 import { plainToInstance } from "class-transformer";
 import { NextFunction, RequestHandler } from "express";
 import { HTTP_STATUS_CODES } from "../configs/constants/statusCode.constants";
+import consola from "consola";
 
 class ValidationMiddleware {
     public bodyValidationMiddleware = (
@@ -59,7 +60,7 @@ class ValidationMiddleware {
 
     }
 
-    
+
     public paramsValidationMiddleware = (
         type: any,
         skipMissingProperties = false,
@@ -85,6 +86,12 @@ class ValidationMiddleware {
             }).catch((err) => next(err));
 
     }
+
+    public enumValidationMiddleware = async (type: any, values: string[], next: NextFunction) => {
+        const invalidValues = values.filter(item => !Object.values(type).includes(item));
+
+        if (invalidValues.length !== 0) next({ message: "Invalid values found: ".concat(invalidValues.join(", ")) })
+    };
 
     private errorFormatter = (
         errors: ValidationError[],
@@ -113,7 +120,6 @@ class ValidationMiddleware {
         return message;
     };
 
-    
 }
 
 export default ValidationMiddleware;

@@ -1,4 +1,6 @@
-import { RemoveProductFromCartDto } from "../configs/dtos/request/user.request.dto";
+import { $Enums } from "@prisma/client";
+import { CreateAddressDto, PlaceOrderDto, RemoveProductFromCartDto } from "../configs/dtos/request/user.request.dto";
+import { CreateAddressInterface, PlaceOrderItemInterface, UpdateAddressInterface } from "../configs/interfaces/common.interfaces";
 import prisma from "../prisma/prisma"
 
 class UserServices {
@@ -79,6 +81,101 @@ class UserServices {
                     updatedAt: true,
                     items: true
                 }
+            })
+        } catch (error) {
+            throw error
+        }
+    }
+
+    public placeOrder = async ({ data, userId }: { data: PlaceOrderDto, userId: string }) => {
+        try {
+
+            return await prisma.order.create({
+                data: {
+                    userId,
+                    addressId: data.addressId,
+                    totalAmount: data.totalAmount,
+                    items: {
+                        createMany: {
+                            data: data.items
+                        }
+                    }
+                }
+            })
+
+        } catch (error) {
+            throw error
+        }
+    }
+
+    public cancelOrder = async ({ orderId, userId }: { orderId: string, userId: string }) => {
+        try {
+
+            return await prisma.order.update({
+                where: {
+                    id: orderId,
+                    userId,
+                    cancelled: false,
+                    status: { not: "Shipped" }
+                },
+                data: {
+                    cancelled: true,
+                    items: {
+                        updateMany: {
+                            where: {
+                                orderId
+                            },
+                            data: {
+                                cancelled: true
+                            }
+                        }
+                    }
+                }
+            })
+
+        } catch (error) {
+            throw error
+        }
+    }
+
+    public getOrders = async ({ userId, status }: { userId: string, status?: $Enums.Status[] }) => {
+        try {
+            return await prisma.order.findMany({
+                where: {
+                    userId,
+                    status: {
+                        in: status
+                    }
+                },
+                select: {
+                    _count: true,
+                    cancelled: true,
+                    id: true,
+                    items: true,
+                    status: true,
+                    totalAmount: true
+                }
+            })
+        } catch (error) {
+            throw error
+        }
+    }
+
+    public createAddress = async (address: CreateAddressInterface) => {
+        try {
+            return await prisma.address.create({
+                data: address
+            })
+        } catch (error) {
+            throw error
+        }
+    }
+
+    public updateAddress = async ({ addressId, userId, ...data }: UpdateAddressInterface) => {
+        try {
+            return await prisma.address.update({
+                where: { id: addressId, userId },
+                data
             })
         } catch (error) {
             throw error

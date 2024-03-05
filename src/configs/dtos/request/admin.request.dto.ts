@@ -1,5 +1,6 @@
-import { $Enums, Photo, Product } from "@prisma/client";
-import { IsArray, IsInt, IsNotEmpty, IsOptional, IsString } from "class-validator"
+import { $Enums, Color, Photo, Product, Size, Status } from "@prisma/client";
+import { IsArray, IsEnum, IsInt, IsNotEmpty, IsOptional, IsString } from "class-validator"
+import { CancelOrderDto } from "./user.request.dto";
 
 export class CreateProductDto {
     @IsString()
@@ -82,11 +83,13 @@ export class UpdateProductDto {
 
     @IsArray()
     @IsOptional()
-    colors: $Enums.Color[]
+    @IsEnum(Color)
+    colors: Color[]
 
     @IsArray()
     @IsOptional()
-    sizes: $Enums.Size[]
+    @IsEnum(Size)
+    sizes: Size[]
 
     constructor(name: string, description: string, price: number, quantity: number, photos: Photo[], categoryId: string, colors: $Enums.Color[], sizes: $Enums.Size[]) {
         this.name = name;
@@ -109,3 +112,16 @@ export class DeleteProductDto {
         this.productId = productId
     }
 }
+
+export class UpdateOrderStatusDto {
+    @IsString()
+    @IsNotEmpty()
+    @IsEnum(Status)
+    status: Status
+
+    constructor(status: Status) {
+        this.status = status
+    }
+}
+
+export class UpdateOrderStatusPramsDto extends CancelOrderDto { }
