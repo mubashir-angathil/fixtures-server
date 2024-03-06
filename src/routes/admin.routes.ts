@@ -46,6 +46,11 @@ class AdminRoute extends AdminController implements Routes {
             this.middlewares.validationMiddleware.paramsValidationMiddleware(UpdateOrderStatusPramsDto),
             this.middlewares.validationMiddleware.queryValidationMiddleware(UpdateOrderStatusDto),
             tryCatchHandler(this.updateOrderStatusController));
+        
+            this.router.post("/product/qa/create")
+            this.router.post("/product/qa/update")
+            this.router.post("/product/qa/remove")
+            this.router.post("/product/qa")
 
     }
 }

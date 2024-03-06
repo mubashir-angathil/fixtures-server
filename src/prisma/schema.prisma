@@ -8,18 +8,20 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(auto()) @map("_id") @db.ObjectId
-  username  String    @unique
-  email     String    @unique
-  password  String
-  dob       DateTime
-  role      Roles     @default(Customer)
-  address   Address[]
-  Order     Order[]
-  Cart      Cart[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  Product   Product[]
+  id            String          @id @default(auto()) @map("_id") @db.ObjectId
+  username      String          @unique
+  email         String          @unique
+  password      String
+  dob           DateTime
+  role          Roles           @default(Customer)
+  address       Address[]
+  Order         Order[]
+  Cart          Cart[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  Product       Product[]
+  ProductReview ProductReview[]
+  ReviewReply   ReviewReply[]
 }
 
 model Address {
@@ -40,19 +42,20 @@ model Address {
 }
 
 model Product {
-  id          String      @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  description String
-  price       Float
-  categoryId  String      @db.ObjectId
-  vendorId    String      @db.ObjectId
-  quantity    Int
-  category    Category    @relation(fields: [categoryId], references: [id])
-  vendor      User        @relation(fields: [vendorId], references: [id])
-  colors      Color[]
-  sizes       Size[]
-  photos      Photo[]
-  OrderItem   OrderItem[]
+  id            String          @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  description   String
+  price         Float
+  categoryId    String          @db.ObjectId
+  vendorId      String          @db.ObjectId
+  quantity      Int
+  category      Category        @relation(fields: [categoryId], references: [id])
+  vendor        User            @relation(fields: [vendorId], references: [id])
+  colors        Color[]
+  sizes         Size[]
+  photos        Photo[]
+  orderItems     OrderItem[]
+  productReviews ProductReview[]
 }
 
 model Category {
@@ -128,6 +131,36 @@ model Promotion {
   OrderItem      OrderItem[]
 }
 
+model ProductReview {
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  productId   String        @db.ObjectId
+  reviewerId  String        @db.ObjectId
+  review      String
+  rating      Float
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  likes       Int           @default(0)
+  dislikes    Int           @default(0)
+  tags        ReviewTags[]
+  images      String[]
+  verified    Boolean       @default(false)
+  helpfulness Float?
+  replies     ReviewReply[]
+  reviewer    User          @relation(fields: [reviewerId], references: [id])
+  product     Product       @relation(fields: [productId], references: [id])
+}
+
+model ReviewReply {
+  id        String        @id @default(auto()) @map("_id") @db.ObjectId
+  reviewId  String        @db.ObjectId
+  authorId  String        @db.ObjectId
+  content   String
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  review    ProductReview @relation(fields: [reviewId], references: [id])
+  author    User          @relation(fields: [authorId], references: [id])
+}
+
 enum DiscountType {
   FIXED_AMOUNT
   PERCENTAGE
@@ -160,6 +193,11 @@ enum Size {
 enum AddressType {
   Home
   Work
+}
+
+enum ReviewTags {
+  Negative
+  Positive
 }
 
 type Photo {

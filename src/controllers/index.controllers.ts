@@ -53,6 +53,31 @@ class IndexControllers {
             data: product
         });
     };
+
+    public getProductReviewsController = async (req: Request, res: Response, next: NextFunction) => {
+        const productId = req.params?.productId
+        const page = req.query.page;
+        const limit = req.query.limit;
+        const pagination = this.paginationHelpers.getCurrentPagination({ limit, page })
+
+        if (!productId) next({ message: "Product id is missing!!" })
+
+        const [count, reviews] = await this.services.productServices.getProductReviews(productId, pagination)
+
+        if (!reviews) throw next({ message: "Oops!! product reviews fetching failed!!" })
+
+        res.status(HTTP_STATUS_CODES.OK).json({
+            success: true,
+            message: "Products fetched successfully",
+            data: reviews,
+            totalCount: count,
+            count: reviews.length,
+            page: parseInt(page as string),
+            limit: pagination.limit
+        });
+    }
+
+
 }
 
 export default IndexControllers;

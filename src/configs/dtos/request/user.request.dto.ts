@@ -1,5 +1,6 @@
-import { Color, Size, AddressType} from "@prisma/client";
-import { IsArray, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import { Color, Size, AddressType } from "@prisma/client";
+import { IsArray, IsEnum, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import { isFloat32Array } from "util/types";
 
 export class AddProductToCartDto {
     @IsString()
@@ -191,5 +192,50 @@ export class CancelOrderDto {
 
     constructor(orderId: string) {
         this.orderId = orderId
+    }
+}
+
+export class CreateReviewDto {
+    @IsInt()
+    @IsNotEmpty()
+    rating: number
+
+    @IsString()
+    @IsNotEmpty()
+    review: string
+
+    @IsArray()
+    @IsNotEmpty()
+    @IsOptional()
+    images?: string[]
+
+    constructor(rating: number, review: string) {
+        this.rating = rating
+        this.review = review
+    }
+}
+export class CreateProductReviewsParamsDto {
+    @IsString()
+    @IsNotEmpty()
+    productId: string
+
+    constructor(productId: string) {
+        this.productId = productId
+    }
+}
+
+export class UpdateProductReviewsParamsDto {
+
+    @IsString()
+    @IsNotEmpty()
+    productId: string
+
+    @IsString()
+    @IsNotEmpty()
+    reviewId: string
+
+    constructor(reviewId: string, productId: string) {
+        this.productId = productId
+        this.reviewId = reviewId
     }
 }

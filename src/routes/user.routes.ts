@@ -3,7 +3,7 @@ import { Routes } from "../configs/interfaces/routes.interface";
 import middlewares from "../middlewares/middlewares";
 import tryCatchHandler from "../utils/tryCatchHandler";
 import UserController from "../controllers/user.controllers";
-import { AddProductToCartDto, CancelOrderDto, CreateAddressDto, PlaceOrderDto, RemoveProductFromCartDto, UpdateAddressDto, UpdateAddressParamsDto } from "../configs/dtos/request/user.request.dto";
+import { AddProductToCartDto, CancelOrderDto, CreateAddressDto, CreateProductReviewsParamsDto, PlaceOrderDto, RemoveProductFromCartDto, UpdateAddressDto, UpdateAddressParamsDto, UpdateProductReviewsParamsDto } from "../configs/dtos/request/user.request.dto";
 
 class UserRoute extends UserController implements Routes {
     path?: string = "/user"
@@ -75,6 +75,26 @@ class UserRoute extends UserController implements Routes {
             this.middlewares.validationMiddleware.bodyValidationMiddleware(UpdateAddressDto),
             tryCatchHandler(this.updateAddressController)
         );
+
+        this.router.post(
+            "/product/:productId/review/create",
+            this.middlewares.authMiddleware.verifyToken,
+            this.middlewares.authMiddleware.validateUserRole,
+            this.middlewares.validationMiddleware.paramsValidationMiddleware(CreateProductReviewsParamsDto),
+            tryCatchHandler(this.createProductReviewController)
+        )
+        this.router.post("/product/:productId/review/:reviewId/update",
+            this.middlewares.authMiddleware.verifyToken,
+            this.middlewares.authMiddleware.validateUserRole,
+            this.middlewares.validationMiddleware.paramsValidationMiddleware(UpdateProductReviewsParamsDto),
+            tryCatchHandler(this.updateProductReviewController)
+        )
+        this.router.delete("/product/:productId/review/:reviewId/remove",
+            this.middlewares.authMiddleware.verifyToken,
+            this.middlewares.authMiddleware.validateUserRole,
+            this.middlewares.validationMiddleware.paramsValidationMiddleware(UpdateProductReviewsParamsDto),
+            tryCatchHandler(this.removeProductReviewController)
+        )
     }
 }
 

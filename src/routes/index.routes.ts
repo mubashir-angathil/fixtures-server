@@ -5,6 +5,7 @@ import IndexControllers from "../controllers/index.controllers";
 import tryCatchHandler from "../utils/tryCatchHandler";
 import middlewares from "../middlewares/middlewares";
 import { PaginationDto } from "../configs/dtos/request/index.request.dto";
+import { CreateProductReviewsParamsDto } from "../configs/dtos/request/user.request.dto";
 
 class IndexRoute extends IndexControllers implements Routes {
     public path?: string = "";
@@ -28,6 +29,11 @@ class IndexRoute extends IndexControllers implements Routes {
 
         this.router.get("/product/:productId",
             tryCatchHandler(this.getProductByIdController));
+
+        this.router.get("/product/:productId/reviews",
+            this.middlewares.validationMiddleware.queryValidationMiddleware(PaginationDto),
+            this.middlewares.validationMiddleware.paramsValidationMiddleware(CreateProductReviewsParamsDto),
+            tryCatchHandler(this.getProductReviewsController));
     }
 }
 

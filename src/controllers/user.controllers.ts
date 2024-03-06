@@ -150,8 +150,40 @@ class UserController {
         })
     }
 
+    public createProductReviewController = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+        const productId = req.params?.productId
+        const userId = req.user?.id
+        if (!productId) throw next({ message: "Product id is missing!!" })
+        if (!userId) throw next({ message: "User id is missing!!" })
 
+        const review = await this.services.productServices.createProductReview({ ...req.body, productId, reviewerId: userId })
 
+        if (!review) throw next({ message: "Review creation failed!!" })
+
+        res.status(HTTP_STATUS_CODES.CREATED).json({
+            success: true,
+            message: "Review created successfully!!",
+            data: review
+        })
+
+    }
+    public updateProductReviewController = async (req: RequestWithUser, res: Response, next: NextFunction) => { }
+
+    public removeProductReviewController = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+        const reviewId = req.params?.reviewId
+        const userId = req.user?.id
+        if (!reviewId) throw next({ message: "Review id is missing!!" })
+        if (!userId) throw next({ message: "User id is missing!!" })
+
+        const review = await this.services.productServices.removeProductReview({ reviewerId: userId, reviewId })
+
+        if (!review) throw next({ message: "Review deletion failed!!" })
+
+        res.status(HTTP_STATUS_CODES.OK).json({
+            success: true,
+            message: "Review deleted successfully!!"
+        })
+    }
 
 
 }
