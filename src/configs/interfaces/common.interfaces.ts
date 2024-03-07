@@ -2,7 +2,7 @@ import { $Enums, Roles } from "@prisma/client";
 import { Request } from "express";
 import { CreateUserInterface } from "./auth.interface";
 import { CreateUserDto } from "../dtos/response/auth.request.dto";
-import { CreateAddressDto, CreateReviewDto, PlaceOrderDto, PlaceOrderItemType, UpdateAddressDto } from "../dtos/request/user.request.dto";
+import { CreateAddressDto, CreateReviewDto, PlaceOrderDto, PlaceOrderItemType, UpdateAddressDto, UpdateProductReviewsDto } from "../dtos/request/user.request.dto";
 
 export interface DoSignUpInterface extends CreateUserDto {
     role: $Enums.Roles;
@@ -34,7 +34,7 @@ export interface CreateReviewInterface extends CreateReviewDto {
     reviewerId: string
     productId: string
 }
-
+export interface UpdateReviewInterface extends RemoveReviewInterface, UpdateProductReviewsDto {}
 export interface RemoveReviewInterface {
     reviewerId: string
     reviewId: string

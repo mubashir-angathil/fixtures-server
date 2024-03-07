@@ -1,5 +1,5 @@
 import { CreateProductDto, UpdateProductDto } from "../configs/dtos/request/admin.request.dto";
-import { CreateReviewInterface, PaginationInterface, RemoveReviewInterface } from "../configs/interfaces/common.interfaces";
+import { CreateReviewInterface, PaginationInterface, RemoveReviewInterface, UpdateReviewInterface } from "../configs/interfaces/common.interfaces";
 import prisma from "../prisma/prisma";
 import { PrismaClient } from "@prisma/client";
 
@@ -96,6 +96,24 @@ class ProductServices {
                     productId,
                     images,
                     verified: Boolean(verifiedBuyer)
+                }
+            })
+        } catch (error) {
+            throw error
+        }
+    };
+
+    public updateProductReview = async ({ rating, review, reviewId, reviewerId, images }: UpdateReviewInterface) => {
+        try {
+            return await prisma.productReview.update({
+                where: {
+                    id: reviewId,
+                },
+                data: {
+                    rating,
+                    review,
+                    reviewerId,
+                    images,
                 }
             })
         } catch (error) {

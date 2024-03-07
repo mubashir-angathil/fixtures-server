@@ -167,7 +167,23 @@ class UserController {
         })
 
     }
-    public updateProductReviewController = async (req: RequestWithUser, res: Response, next: NextFunction) => { }
+    public updateProductReviewController = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+        const reviewId = req.params?.reviewId
+        const userId = req.user?.id
+        if (!reviewId) throw next({ message: "Review id is missing!!" })
+        if (!userId) throw next({ message: "User id is missing!!" })
+
+
+        const review = await this.services.productServices.updateProductReview({ ...req.body, reviewId, reviewerId: userId })
+
+        if (!review) throw next({ message: "Review updates failed!!" })
+
+        res.status(HTTP_STATUS_CODES.CREATED).json({
+            success: true,
+            message: "Review updated successfully!!",
+            data: review
+        })
+    }
 
     public removeProductReviewController = async (req: RequestWithUser, res: Response, next: NextFunction) => {
         const reviewId = req.params?.reviewId
