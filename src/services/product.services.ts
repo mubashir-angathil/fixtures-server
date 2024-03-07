@@ -1,7 +1,7 @@
 import { CreateProductDto, UpdateProductDto } from "../configs/dtos/request/admin.request.dto";
-import { CreateReviewInterface, PaginationInterface, RemoveReviewInterface, UpdateReviewInterface } from "../configs/interfaces/common.interfaces";
+import { CreateReviewInterface, PaginationInterface, ReactionInterface, RemoveReviewInterface, UpdateReviewInterface } from "../configs/interfaces/common.interfaces";
 import prisma from "../prisma/prisma";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Reactions } from "@prisma/client";
 
 class ProductServices {
 
@@ -123,17 +123,67 @@ class ProductServices {
 
     public removeProductReview = async ({ reviewId, reviewerId }: RemoveReviewInterface) => {
         try {
-
-            return await prisma.productReview.delete({
-                where: {
-                    id: reviewId,
-                    reviewerId
-                }
-            })
+            return await prisma.$transaction([
+                prisma.reaction.deleteMany({
+                    where: {
+                        reviewId
+                    }
+                }),
+                prisma.productReview.delete({
+                    where: {
+                        id: reviewId,
+                        reviewerId
+                    }
+                })
+            ])
         } catch (error) {
             throw error
         }
     };
+
+    public reactToProductReview = async (reactionData: ReactionInterface) => {
+        try {
+            const { reaction, reviewId, authorId } = reactionData;
+
+            await this.checkIsIdExist(reviewId, prisma.productReview, "Foreign Key constraint error, review not found!!")
+
+            const existingReaction = await prisma.reaction.findFirst({
+                where: {
+                    reviewId,
+                    authorId
+                }
+            });
+
+            if (!existingReaction && reaction) {
+                return prisma.reaction.create({
+                    data: {
+                        reaction,
+                        authorId,
+                        reviewId
+                    }
+                });
+            } else if (existingReaction && reaction) {
+                return prisma.reaction.update({
+                    where: {
+                        id: existingReaction.id
+                    },
+                    data: {
+                        reaction
+                    }
+                });
+            } else if (existingReaction && reaction === undefined) {
+                return prisma.reaction.delete({
+                    where: {
+                        id: existingReaction.id
+                    }
+                });
+            }
+
+            throw new Error("Reaction not found")
+        } catch (error) {
+            throw error
+        }
+    }
 
     public getProductReviews = async (productId: string, { limit, offset }: PaginationInterface) => {
         try {
@@ -143,6 +193,7 @@ class ProductServices {
                     where: {
                         productId
                     },
+                    include: { reactions: true },
                     orderBy: { createdAt: "desc" },
                     skip: offset,
                     take: limit,

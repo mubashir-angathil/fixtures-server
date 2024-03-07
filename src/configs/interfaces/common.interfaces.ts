@@ -1,4 +1,4 @@
-import { $Enums, Roles } from "@prisma/client";
+import { $Enums, Reactions, Roles } from "@prisma/client";
 import { Request } from "express";
 import { CreateUserInterface } from "./auth.interface";
 import { CreateUserDto } from "../dtos/response/auth.request.dto";
@@ -34,8 +34,14 @@ export interface CreateReviewInterface extends CreateReviewDto {
     reviewerId: string
     productId: string
 }
-export interface UpdateReviewInterface extends RemoveReviewInterface, UpdateProductReviewsDto {}
+export interface UpdateReviewInterface extends RemoveReviewInterface, UpdateProductReviewsDto { }
 export interface RemoveReviewInterface {
     reviewerId: string
     reviewId: string
-} 
+}
+
+export interface ReactionInterface {
+    reaction?: Reactions
+    reviewId: string
+    authorId: string
+}

@@ -97,6 +97,13 @@ class UserRoute extends UserController implements Routes {
             this.middlewares.validationMiddleware.paramsValidationMiddleware(UpdateProductReviewsParamsDto),
             tryCatchHandler(this.removeProductReviewController)
         )
+
+        this.router.get(
+            "/product/:productId/review/:reviewId/react",
+            this.middlewares.authMiddleware.verifyToken,
+            this.middlewares.authMiddleware.validateUserRole,
+            tryCatchHandler(this.reactProductReviewController)
+        )
     }
 }
 

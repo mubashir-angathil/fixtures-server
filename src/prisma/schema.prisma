@@ -22,6 +22,7 @@ model User {
   Product       Product[]
   ProductReview ProductReview[]
   ReviewReply   ReviewReply[]
+  Reactions     Reaction[]
 }
 
 model Address {
@@ -42,18 +43,18 @@ model Address {
 }
 
 model Product {
-  id            String          @id @default(auto()) @map("_id") @db.ObjectId
-  name          String
-  description   String
-  price         Float
-  categoryId    String          @db.ObjectId
-  vendorId      String          @db.ObjectId
-  quantity      Int
-  category      Category        @relation(fields: [categoryId], references: [id])
-  vendor        User            @relation(fields: [vendorId], references: [id])
-  colors        Color[]
-  sizes         Size[]
-  photos        Photo[]
+  id             String          @id @default(auto()) @map("_id") @db.ObjectId
+  name           String
+  description    String
+  price          Float
+  categoryId     String          @db.ObjectId
+  vendorId       String          @db.ObjectId
+  quantity       Int
+  category       Category        @relation(fields: [categoryId], references: [id])
+  vendor         User            @relation(fields: [vendorId], references: [id])
+  colors         Color[]
+  sizes          Size[]
+  photos         Photo[]
   orderItems     OrderItem[]
   productReviews ProductReview[]
 }
@@ -132,22 +133,36 @@ model Promotion {
 }
 
 model ProductReview {
-  id          String        @id @default(auto()) @map("_id") @db.ObjectId
-  productId   String        @db.ObjectId
-  reviewerId  String        @db.ObjectId
-  review      String
-  rating      Float
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  likes       Int           @default(0)
-  dislikes    Int           @default(0)
-  tags        ReviewTags[]
-  images      String[]
-  verified    Boolean       @default(false)
-  helpfulness Float?
-  replies     ReviewReply[]
-  reviewer    User          @relation(fields: [reviewerId], references: [id])
-  product     Product       @relation(fields: [productId], references: [id])
+  id         String        @id @default(auto()) @map("_id") @db.ObjectId
+  productId  String        @db.ObjectId
+  reviewerId String        @db.ObjectId
+  review     String
+  rating     Float
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  tags       ReviewTags[]
+  reactions  Reaction[]
+  images     String[]
+  verified   Boolean       @default(false)
+  replies    ReviewReply[]
+  reviewer   User          @relation(fields: [reviewerId], references: [id])
+  product    Product       @relation(fields: [productId], references: [id])
+
+  @@index([productId], name: "idx_product_id")
+  @@index([reviewerId], name: "idx_reviewer_id")
+}
+
+model Reaction {
+  id       String        @id @default(auto()) @map("_id") @db.ObjectId
+  authorId String        @db.ObjectId
+  reviewId String        @db.ObjectId
+  reaction Reactions
+  review   ProductReview @relation(fields: [reviewId], references: [id])
+  author   User          @relation(fields: [authorId], references: [id])
+
+  @@unique(name: "authorIdReviewId", fields: [authorId, reviewId])
+  @@index([authorId], name: "idx_author_id")
+  @@index([reviewId], name: "idx_review_id")
 }
 
 model ReviewReply {
@@ -198,6 +213,12 @@ enum AddressType {
 enum ReviewTags {
   Negative
   Positive
+}
+
+enum Reactions {
+  Helpfull
+  Like
+  Dislike
 }
 
 type Photo {

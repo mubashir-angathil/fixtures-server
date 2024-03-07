@@ -2,7 +2,7 @@ import { NextFunction, Response } from "express"
 import { RequestWithUser } from "../configs/interfaces/common.interfaces"
 import { HTTP_STATUS_CODES } from "../configs/constants/statusCode.constants"
 import services from "../services/services"
-import { Status } from "@prisma/client"
+import { Reactions, Status } from "@prisma/client"
 import { ValidationError, validate, validateOrReject } from "class-validator"
 import consola from "consola"
 import { plainToInstance } from "class-transformer"
@@ -167,6 +167,7 @@ class UserController {
         })
 
     }
+
     public updateProductReviewController = async (req: RequestWithUser, res: Response, next: NextFunction) => {
         const reviewId = req.params?.reviewId
         const userId = req.user?.id
@@ -201,6 +202,26 @@ class UserController {
         })
     }
 
+    public reactProductReviewController = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+        const reaction = req.query?.reaction as Reactions | undefined
+        const reviewId = req.params?.reviewId
+        const userId = req.user?.id
+        if (!reviewId) throw next({ message: "Review id is missing!!" })
+        if (!userId) throw next({ message: "User id is missing!!" })
+
+        if (reaction) {
+            await this.custom.enumValidationMiddleware(Reactions, [reaction as string], next)
+        }
+
+        const reacted = await this.services.productServices.reactToProductReview({ authorId: userId, reaction, reviewId })
+        if (!reacted) throw next({ message: "Oops!! something went wrong, try agin" })
+
+        res.status(HTTP_STATUS_CODES.OK).json({
+            success: true,
+            message: "Reacted successfully",
+            data: reacted
+        })
+    }
 
 }
 

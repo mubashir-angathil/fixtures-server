@@ -1,4 +1,4 @@
-import { Color, Size, AddressType } from "@prisma/client";
+import { Color, Size, AddressType, Reactions } from "@prisma/client";
 import { IsArray, IsEnum, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, Min, Max } from "class-validator";
 
 export class AddProductToCartDto {
