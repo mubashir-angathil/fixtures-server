@@ -72,7 +72,7 @@ class AdminController {
 
         if (!vendorId) throw next({ message: "authorId is missing!" })
         if (!orderId) throw next({ message: "orderId is missing!" })
-        
+
 
         const order = await this.services.adminServices.UpdateOrderStatus({ orderId, status })
 
@@ -83,5 +83,42 @@ class AdminController {
             message: "Order status updated successful!!",
         })
     };
+
+    public replayToProductReviewController = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+        const reviewId = req.params?.reviewId
+        const authorId = req.user?.id
+
+        if (!reviewId) throw next({ message: "Review id is missing!!" })
+        if (!authorId) throw next({ message: "Admin id is missing!!" })
+
+        const replay = await this.services.productServices.replayToProductReview({ authorId, reviewId, ...req.body })
+
+        if (!replay) throw next({ message: "Operation failed, can't replay!! try again" })
+
+        res.status(HTTP_STATUS_CODES.CREATED).json({
+            success: true,
+            message: "You are replied successfully",
+            data: replay
+        })
+
+    }
+
+    public deleteReviewReplayController = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+        const { reviewId, replayId } = req.params
+        const authorId = req.user?.id
+
+        if (!reviewId) throw next({ message: "Review id is missing!!" })
+        if (!authorId) throw next({ message: "Admin id is missing!!" })
+
+        const replay = await this.services.productServices.deleteReviewReplay({ authorId, reviewId, replayId })
+
+        if (!replay) throw next({ message: "Replay deletion failed" })
+
+        res.status(HTTP_STATUS_CODES.OK).json({
+            success: true,
+            message: "Replay deleted successfully",
+        })
+
+    }
 }
 export default AdminController

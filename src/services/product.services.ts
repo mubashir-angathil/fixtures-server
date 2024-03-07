@@ -1,5 +1,5 @@
-import { CreateProductDto, UpdateProductDto } from "../configs/dtos/request/admin.request.dto";
-import { CreateReviewInterface, PaginationInterface, ReactionInterface, RemoveReviewInterface, UpdateReviewInterface } from "../configs/interfaces/common.interfaces";
+import { CreateProductDto, DeleteReviewReplayDto, UpdateProductDto } from "../configs/dtos/request/admin.request.dto";
+import { CreateReviewInterface, DeleteReviewReplayInterface, PaginationInterface, ReactionInterface, RemoveReviewInterface, ReplayToProductReviewInterface, UpdateReviewInterface } from "../configs/interfaces/common.interfaces";
 import prisma from "../prisma/prisma";
 import { PrismaClient, Reactions, ReviewTags } from "@prisma/client";
 
@@ -199,12 +199,40 @@ class ProductServices {
                     where: {
                         productId
                     },
-                    include: { reactions: true },
+                    include: { reactions: true, replies: true, _count: true },
                     orderBy: { createdAt: "desc" },
                     skip: offset,
                     take: limit,
                 })
             ])
+        } catch (error) {
+            throw error
+        }
+    }
+
+    public replayToProductReview = async ({ content, authorId, reviewId }: ReplayToProductReviewInterface) => {
+        try {
+            return await prisma.reviewReply.create({
+                data: {
+                    reviewId,
+                    content,
+                    authorId
+                }
+            })
+        } catch (error) {
+            throw error
+        }
+    }
+
+    public deleteReviewReplay = async ({ replayId, authorId, reviewId }: DeleteReviewReplayInterface) => {
+        try {
+            return await prisma.reviewReply.delete({
+                where: {
+                    id: replayId,
+                    reviewId,
+                    authorId
+                }
+            })
         } catch (error) {
             throw error
         }

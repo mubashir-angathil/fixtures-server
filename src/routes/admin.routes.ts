@@ -3,7 +3,8 @@ import { Routes } from "../configs/interfaces/routes.interface";
 import middlewares from "../middlewares/middlewares";
 import tryCatchHandler from "../utils/tryCatchHandler";
 import AdminController from "../controllers/admin.controllers";
-import { CreateProductDto, DeleteProductDto, UpdateOrderStatusDto, UpdateOrderStatusPramsDto, UpdateProductDto } from "../configs/dtos/request/admin.request.dto";
+import { CreateProductDto, DeleteProductDto, DeleteReviewReplayDto, ReplayToProductReviewDto, UpdateOrderStatusDto, UpdateOrderStatusPramsDto, UpdateProductDto } from "../configs/dtos/request/admin.request.dto";
+import { UpdateProductReviewsParamsDto } from "../configs/dtos/request/user.request.dto";
 
 class AdminRoute extends AdminController implements Routes {
     path?: string | undefined = '/admin';
@@ -46,11 +47,24 @@ class AdminRoute extends AdminController implements Routes {
             this.middlewares.validationMiddleware.paramsValidationMiddleware(UpdateOrderStatusPramsDto),
             this.middlewares.validationMiddleware.queryValidationMiddleware(UpdateOrderStatusDto),
             tryCatchHandler(this.updateOrderStatusController));
-        
-            this.router.post("/product/qa/create")
-            this.router.post("/product/qa/update")
-            this.router.post("/product/qa/remove")
-            this.router.post("/product/qa")
+
+        this.router.post("/product/:productId/review/:reviewId/replay/create",
+            this.middlewares.authMiddleware.verifyToken,
+            this.middlewares.authMiddleware.validateAdminRole,
+            this.middlewares.validationMiddleware.paramsValidationMiddleware(UpdateProductReviewsParamsDto),
+            this.middlewares.validationMiddleware.bodyValidationMiddleware(ReplayToProductReviewDto),
+            tryCatchHandler(this.replayToProductReviewController));
+
+        this.router.delete("/product/:productId/review/:reviewId/replay/:replayId/delete",
+            this.middlewares.authMiddleware.verifyToken,
+            this.middlewares.authMiddleware.validateAdminRole,
+            this.middlewares.validationMiddleware.paramsValidationMiddleware(DeleteReviewReplayDto),
+            tryCatchHandler(this.deleteReviewReplayController));
+
+        this.router.post("/product/qa/create")
+        this.router.post("/product/qa/update")
+        this.router.post("/product/qa/remove")
+        this.router.post("/product/qa")
 
     }
 }
