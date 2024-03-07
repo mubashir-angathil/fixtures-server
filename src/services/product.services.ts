@@ -1,7 +1,7 @@
 import { CreateProductDto, UpdateProductDto } from "../configs/dtos/request/admin.request.dto";
 import { CreateReviewInterface, PaginationInterface, ReactionInterface, RemoveReviewInterface, UpdateReviewInterface } from "../configs/interfaces/common.interfaces";
 import prisma from "../prisma/prisma";
-import { PrismaClient, Reactions } from "@prisma/client";
+import { PrismaClient, Reactions, ReviewTags } from "@prisma/client";
 
 class ProductServices {
 
@@ -95,7 +95,8 @@ class ProductServices {
                     reviewerId,
                     productId,
                     images,
-                    verified: Boolean(verifiedBuyer)
+                    verified: Boolean(verifiedBuyer),
+                    tag: rating >= 3 ? "Positive" : "Negative"
                 }
             })
         } catch (error) {
@@ -105,6 +106,10 @@ class ProductServices {
 
     public updateProductReview = async ({ rating, review, reviewId, reviewerId, images }: UpdateReviewInterface) => {
         try {
+            let tag: ReviewTags | undefined;
+
+            if (rating) tag = rating >= 3 ? "Positive" : "Negative"
+
             return await prisma.productReview.update({
                 where: {
                     id: reviewId,
@@ -114,6 +119,7 @@ class ProductServices {
                     review,
                     reviewerId,
                     images,
+                    tag,
                 }
             })
         } catch (error) {

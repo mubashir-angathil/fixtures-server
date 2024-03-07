@@ -68,7 +68,7 @@ class IndexControllers {
 
         res.status(HTTP_STATUS_CODES.OK).json({
             success: true,
-            message: "Products fetched successfully",
+            message: "Product reviews fetched successfully",
             data: reviews,
             totalCount: count,
             count: reviews.length,

@@ -140,7 +140,7 @@ model ProductReview {
   rating     Float
   createdAt  DateTime      @default(now())
   updatedAt  DateTime      @updatedAt
-  tags       ReviewTags[]
+  tag        ReviewTags    @default(Positive)
   reactions  Reaction[]
   images     String[]
   verified   Boolean       @default(false)
