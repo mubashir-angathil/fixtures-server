@@ -2,8 +2,8 @@ import { $Enums, Reactions, Roles } from "@prisma/client";
 import { Request } from "express";
 import { CreateUserInterface } from "./auth.interface";
 import { CreateUserDto } from "../dtos/response/auth.request.dto";
-import { CreateAddressDto, CreateReviewDto, PlaceOrderItemType, UpdateAddressDto, UpdateProductReviewsDto } from "../dtos/request/user.request.dto";
-import { ReplayToProductReviewDto } from "../dtos/request/admin.request.dto";
+import { CreateAddressDto, CreateProductQuestionDto, CreateReviewDto, PlaceOrderItemType, UpdateAddressDto, UpdateProductReviewsDto } from "../dtos/request/user.request.dto";
+import { AnswerToQuestionDto, CreateProductQADto, RemoveProductQaParamsDto, ReplayToProductReviewDto, UpdateProductQADto } from "../dtos/request/admin.request.dto";
 
 export interface DoSignUpInterface extends CreateUserDto {
     role: $Enums.Roles;
@@ -56,4 +56,29 @@ export interface DeleteReviewReplayInterface {
     authorId: string
     reviewId: string
     replayId: string
+}
+
+export interface CreateProductQAInterface extends CreateProductQADto {
+    productId: string
+    vendorId: string
+}
+
+export interface AnswerToQuestionInterface extends AnswerToQuestionDto {
+    qaId: string
+    productId: string
+    authorId: string
+}
+
+export interface CreateProductQuestionInterface extends CreateProductQuestionDto {
+    productId: string
+}
+
+export interface DeleteProductQaInterface extends RemoveProductQaParamsDto {
+    authorId: string
+}
+
+export interface UpdateProductQaInterface extends UpdateProductQADto {
+    qaId: string
+    productId: string
+    authorId: string
 }

@@ -1,5 +1,5 @@
 import { $Enums, Color, Photo, Product, Size, Status } from "@prisma/client";
-import { IsArray, IsEnum, IsInt, IsNotEmpty, IsOptional, IsString } from "class-validator"
+import { IsArray, IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, MaxLength, MinLength, isString } from "class-validator"
 import { CancelOrderDto, UpdateProductReviewsParamsDto } from "./user.request.dto";
 
 export class CreateProductDto {
@@ -145,3 +145,58 @@ export class DeleteReviewReplayDto extends UpdateProductReviewsParamsDto {
         this.replayId = replayId
     }
 }
+
+export class CreateProductQADto {
+    @IsString()
+    @IsNotEmpty()
+    @MinLength(8)
+    question: string
+
+    @IsString()
+    @IsOptional()
+    @MinLength(2)
+    answer?: string
+
+    constructor(question: string, answer: string) {
+        this.question = question
+        this.answer = answer
+    }
+}
+
+export class UpdateProductQADto {
+    @IsString()
+    @IsOptional()
+    @MinLength(8)
+    question?: string
+
+    @IsString()
+    @IsOptional()
+    @MinLength(2)
+    answer?: string
+}
+
+export class CreateProductQAParamsDto extends DeleteProductDto { }
+
+export class AnswerToQuestionDto {
+    @IsString()
+    @IsNotEmpty()
+    @MinLength(2)
+    answer: string
+
+    constructor(answer: string) {
+        this.answer = answer
+    }
+}
+
+export class AnswerToQuestionParamsDto extends CreateProductQAParamsDto {
+    @IsString()
+    @IsNotEmpty()
+    qaId: string
+
+    constructor(qaId: string, productId: string) {
+        super(productId)
+        this.qaId = qaId
+    }
+}
+
+export class RemoveProductQaParamsDto extends AnswerToQuestionParamsDto { }

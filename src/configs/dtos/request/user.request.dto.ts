@@ -1,5 +1,5 @@
 import { Color, Size, AddressType, Reactions } from "@prisma/client";
-import { IsArray, IsEnum, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, Min, Max } from "class-validator";
+import { IsArray, IsEnum, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, Min, Max, MinLength } from "class-validator";
 
 export class AddProductToCartDto {
     @IsString()
@@ -278,5 +278,18 @@ export class UpdateProductReviewsParamsDto {
     constructor(reviewId: string, productId: string) {
         this.productId = productId
         this.reviewId = reviewId
+    }
+}
+
+export class CreateProductQuestionParamsDto extends CreateProductReviewsParamsDto { }
+export class CreateProductAnswerParamsDto extends CreateProductReviewsParamsDto { }
+export class CreateProductQuestionDto {
+    @IsString()
+    @IsNotEmpty()
+    @MinLength(8)
+    question: string
+
+    constructor(question: string) {
+        this.question = question
     }
 }

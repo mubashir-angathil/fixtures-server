@@ -1,4 +1,4 @@
-import { IsDateString, IsInt, IsNotEmpty, IsNumber, IsString, IsUrl, isNotEmpty } from "class-validator";
+import { IsDateString, IsInt, IsNotEmpty, IsNumber, IsString, IsUrl, MinLength, isNotEmpty } from "class-validator";
 
 export class CreatePromotionDto {
     @IsString()

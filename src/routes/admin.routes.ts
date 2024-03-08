@@ -3,7 +3,7 @@ import { Routes } from "../configs/interfaces/routes.interface";
 import middlewares from "../middlewares/middlewares";
 import tryCatchHandler from "../utils/tryCatchHandler";
 import AdminController from "../controllers/admin.controllers";
-import { CreateProductDto, DeleteProductDto, DeleteReviewReplayDto, ReplayToProductReviewDto, UpdateOrderStatusDto, UpdateOrderStatusPramsDto, UpdateProductDto } from "../configs/dtos/request/admin.request.dto";
+import { AnswerToQuestionDto, AnswerToQuestionParamsDto, CreateProductDto, CreateProductQADto, CreateProductQAParamsDto, DeleteProductDto, DeleteReviewReplayDto, RemoveProductQaParamsDto, ReplayToProductReviewDto, UpdateOrderStatusDto, UpdateOrderStatusPramsDto, UpdateProductDto, UpdateProductQADto } from "../configs/dtos/request/admin.request.dto";
 import { UpdateProductReviewsParamsDto } from "../configs/dtos/request/user.request.dto";
 
 class AdminRoute extends AdminController implements Routes {
@@ -61,10 +61,36 @@ class AdminRoute extends AdminController implements Routes {
             this.middlewares.validationMiddleware.paramsValidationMiddleware(DeleteReviewReplayDto),
             tryCatchHandler(this.deleteReviewReplayController));
 
-        this.router.post("/product/qa/create")
-        this.router.post("/product/qa/update")
-        this.router.post("/product/qa/remove")
-        this.router.post("/product/qa")
+        this.router.post(
+            "/product/:productId/qa/create",
+            this.middlewares.authMiddleware.verifyToken,
+            this.middlewares.authMiddleware.validateAdminRole,
+            this.middlewares.validationMiddleware.paramsValidationMiddleware(CreateProductQAParamsDto),
+            this.middlewares.validationMiddleware.bodyValidationMiddleware(CreateProductQADto),
+            tryCatchHandler(this.createProductQAController));
+
+        this.router.post(
+            "/product/:productId/qa/:qaId/update",
+            this.middlewares.authMiddleware.verifyToken,
+            this.middlewares.authMiddleware.validateAdminRole,
+            this.middlewares.validationMiddleware.paramsValidationMiddleware(RemoveProductQaParamsDto),
+            this.middlewares.validationMiddleware.bodyValidationMiddleware(UpdateProductQADto),
+            tryCatchHandler(this.updateProductQAController));
+
+        this.router.post(
+            "/product/:productId/question/:qaId/answer",
+            this.middlewares.authMiddleware.verifyToken,
+            this.middlewares.authMiddleware.validateAdminRole,
+            this.middlewares.validationMiddleware.paramsValidationMiddleware(AnswerToQuestionParamsDto),
+            this.middlewares.validationMiddleware.bodyValidationMiddleware(AnswerToQuestionDto),
+            tryCatchHandler(this.answerToQuestionController)
+        )
+        this.router.delete("/product/:productId/qa/:qaId/delete",
+            this.middlewares.authMiddleware.verifyToken,
+            this.middlewares.authMiddleware.validateAdminRole,
+            this.middlewares.validationMiddleware.paramsValidationMiddleware(RemoveProductQaParamsDto),
+            tryCatchHandler(this.deleteProductQaController)
+        )
 
     }
 }

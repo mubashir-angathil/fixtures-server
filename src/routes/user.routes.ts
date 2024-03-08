@@ -3,7 +3,7 @@ import { Routes } from "../configs/interfaces/routes.interface";
 import middlewares from "../middlewares/middlewares";
 import tryCatchHandler from "../utils/tryCatchHandler";
 import UserController from "../controllers/user.controllers";
-import { AddProductToCartDto, CancelOrderDto, CreateAddressDto, CreateProductReviewsDto, CreateProductReviewsParamsDto, PlaceOrderDto, RemoveProductFromCartDto, UpdateAddressDto, UpdateAddressParamsDto, UpdateProductReviewsDto, UpdateProductReviewsParamsDto } from "../configs/dtos/request/user.request.dto";
+import { AddProductToCartDto, CancelOrderDto, CreateAddressDto, CreateProductQuestionDto, CreateProductQuestionParamsDto, CreateProductReviewsDto, CreateProductReviewsParamsDto, PlaceOrderDto, RemoveProductFromCartDto, UpdateAddressDto, UpdateAddressParamsDto, UpdateProductReviewsDto, UpdateProductReviewsParamsDto } from "../configs/dtos/request/user.request.dto";
 
 class UserRoute extends UserController implements Routes {
     path?: string = "/user"
@@ -104,6 +104,15 @@ class UserRoute extends UserController implements Routes {
             this.middlewares.authMiddleware.validateUserRole,
             tryCatchHandler(this.reactProductReviewController)
         )
+
+        this.router.post(
+            "/product/:productId/question/create",
+            this.middlewares.authMiddleware.verifyToken,
+            this.middlewares.authMiddleware.validateUserRole,
+            this.middlewares.validationMiddleware.paramsValidationMiddleware(CreateProductQuestionParamsDto),
+            this.middlewares.validationMiddleware.bodyValidationMiddleware(CreateProductQuestionDto),
+            tryCatchHandler(this.createProductQuestionController)
+        );
     }
 }
 

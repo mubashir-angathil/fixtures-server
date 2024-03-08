@@ -77,6 +77,29 @@ class IndexControllers {
         });
     }
 
+    public getProductQuestionAndAnswersController = async (req: Request, res: Response, next: NextFunction) => {
+        const productId = req.params?.productId
+        const page = req.query.page;
+        const limit = req.query.limit;
+        const pagination = this.paginationHelpers.getCurrentPagination({ limit, page })
+
+        if (!productId) next({ message: "Product id is missing!!" })
+
+        const [count, qas] = await this.services.productServices.getProductQuestionAndAnswers(productId, pagination)
+
+        if (!qas) throw next({ message: "Oops!! product Q&As fetching failed!!" })
+
+        res.status(HTTP_STATUS_CODES.OK).json({
+            success: true,
+            message: "Product Q&As fetched successfully",
+            data: qas,
+            totalCount: count,
+            count: qas.length,
+            page: parseInt(page as string),
+            limit: pagination.limit
+        });
+    }
+
 
 }
 

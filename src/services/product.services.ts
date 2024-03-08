@@ -1,5 +1,5 @@
 import { CreateProductDto, DeleteReviewReplayDto, UpdateProductDto } from "../configs/dtos/request/admin.request.dto";
-import { CreateReviewInterface, DeleteReviewReplayInterface, PaginationInterface, ReactionInterface, RemoveReviewInterface, ReplayToProductReviewInterface, UpdateReviewInterface } from "../configs/interfaces/common.interfaces";
+import { AnswerToQuestionInterface, CreateProductQAInterface, CreateProductQuestionInterface, CreateReviewInterface, DeleteProductQaInterface, DeleteReviewReplayInterface, PaginationInterface, ReactionInterface, RemoveReviewInterface, ReplayToProductReviewInterface, UpdateProductQaInterface, UpdateReviewInterface } from "../configs/interfaces/common.interfaces";
 import prisma from "../prisma/prisma";
 import { PrismaClient, Reactions, ReviewTags } from "@prisma/client";
 
@@ -238,6 +238,112 @@ class ProductServices {
         }
     }
 
+    public createProductQA = async ({ answer, productId, question, vendorId }: CreateProductQAInterface) => {
+        try {
+            await this.checkIsVendorOfProduct(vendorId, productId)
+
+            const productQA = await prisma.productQA.findUnique({
+                where: {
+                    productIdQuestion: { productId, question }
+                }
+            })
+
+            if (productQA) throw new Error("Oops! Question already found")
+            else return await prisma.productQA.create({
+                data: {
+                    productId,
+                    question,
+                    answer
+                }
+            })
+        } catch (error) {
+            throw error
+        }
+    }
+
+    public updateProductQA = async ({ answer, productId, question, authorId, qaId }: UpdateProductQaInterface) => {
+        try {
+            await this.checkIsVendorOfProduct(authorId, productId)
+
+            return await prisma.productQA.update({
+                where: {
+                    id: qaId,
+                    productId,
+                },
+                data: {
+                    productId,
+                    question,
+                    answer
+                }
+            })
+        } catch (error) {
+            throw error
+        }
+    }
+
+    public answerToQuestion = async ({ answer, productId, qaId, authorId }: AnswerToQuestionInterface) => {
+        try {
+            await this.checkIsVendorOfProduct(authorId, productId)
+
+            return await prisma.productQA.update({
+                where: {
+                    id: qaId,
+                    productId
+                },
+                data: {
+                    answer
+                }
+            })
+
+        } catch (error) {
+            throw error
+        }
+    }
+
+    public createProductQuestion = async ({ question, productId }: CreateProductQuestionInterface) => {
+        try {
+            return await prisma.productQA.create({
+                data: {
+                    question,
+                    productId
+                }
+            })
+        } catch (error) {
+            throw error
+        }
+    }
+
+    public getProductQuestionAndAnswers = async (productId: string, { limit, offset }: PaginationInterface) => {
+        try {
+            return await prisma.$transaction([
+                prisma.productQA.count(),
+                prisma.productQA.findMany({
+                    where: {
+                        productId
+                    },
+                    skip: offset,
+                    take: limit,
+                })
+            ])
+        } catch (error) {
+            throw error
+        }
+    }
+
+    public deleteProductQa = async ({ authorId, productId, qaId }: DeleteProductQaInterface) => {
+        try {
+            await this.checkIsVendorOfProduct(authorId, productId)
+
+            return await prisma.productQA.delete({
+                where: {
+                    productId,
+                    id: qaId
+                }
+            })
+        } catch (error) {
+            throw error
+        }
+    }
     private checkIsIdExist = async (id: string, model: any, message: string) => {
         try {
             const isIdExist = await model.findUnique({ where: { id } })
@@ -247,6 +353,22 @@ class ProductServices {
         } catch (error) {
             throw error
         }
+    }
+
+    private checkIsVendorOfProduct = async (adminId: string, productId: string) => {
+        try {
+            const vendor = await prisma.product.findUnique({
+                where: {
+                    id: productId,
+                    vendorId: adminId
+                }
+            })
+            if (vendor) return true
+            else throw new Error("Oops, authentication failed!")
+        } catch (error) {
+            throw error
+        }
+
     }
 }
 export default ProductServices;

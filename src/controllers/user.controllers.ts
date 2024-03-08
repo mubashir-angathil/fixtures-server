@@ -1,11 +1,8 @@
-import { NextFunction, Response } from "express"
+import { NextFunction, Request, Response } from "express"
 import { RequestWithUser } from "../configs/interfaces/common.interfaces"
 import { HTTP_STATUS_CODES } from "../configs/constants/statusCode.constants"
 import services from "../services/services"
 import { Reactions, Status } from "@prisma/client"
-import { ValidationError, validate, validateOrReject } from "class-validator"
-import consola from "consola"
-import { plainToInstance } from "class-transformer"
 import ValidationMiddleware from "../middlewares/validation.middlewares"
 
 class UserController {
@@ -220,6 +217,22 @@ class UserController {
             success: true,
             message: "Reacted successfully",
             data: reacted
+        })
+    }
+
+    public createProductQuestionController = async (req: Request, res: Response, next: NextFunction) => {
+        const { productId } = req.params
+
+        if (!productId) throw next({ message: "Product id is missing!!" })
+
+        const question = await this.services.productServices.createProductQuestion({ question: req.body.question, productId })
+
+        if (!question) throw next({ message: "Failed to create Question" })
+
+        res.status(HTTP_STATUS_CODES.CREATED).json({
+            success: true,
+            message: "Product question creation successfully",
+            data: question
         })
     }
 

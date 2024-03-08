@@ -120,5 +120,78 @@ class AdminController {
         })
 
     }
+
+    public createProductQAController = async (req: Request, res: Response, next: NextFunction) => {
+        const { productId } = req.params
+
+        if (!productId) throw next({ message: "Product id is missing!!" })
+
+        const qa = await this.services.productServices.createProductQA({ ...req.body, productId })
+
+        if (!qa) throw next({ message: "Failed to create Q&A" })
+
+        res.status(HTTP_STATUS_CODES.CREATED).json({
+            success: true,
+            message: "Product Q&A created successfully",
+            data: qa
+        })
+    }
+
+    public updateProductQAController = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+        const { productId, qaId } = req.params
+        const authorId = req.user?.id
+
+        if (!authorId) throw next({ message: "Admin id is missing!!" })
+        if (!productId) throw next({ message: "Product id is missing!!" })
+        if (!qaId) throw next({ message: "Q&A id is missing!!" })
+
+        const qa = await this.services.productServices.updateProductQA({ ...req.body, productId, qaId, authorId })
+
+        if (!qa) throw next({ message: "Failed to update Q&A" })
+
+        res.status(HTTP_STATUS_CODES.CREATED).json({
+            success: true,
+            message: "Product Q&A updated successfully",
+            data: qa
+        })
+    }
+
+
+    public answerToQuestionController = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+        const { productId, qaId } = req.params
+        const authorId = req.user?.id
+
+        if (!productId) throw next({ message: "Product id is missing!!" })
+        if (!qaId) throw next({ message: "Q&A id is missing!!" })
+
+        const answer = await this.services.productServices.answerToQuestion({ ...req.body, qaId, productId, authorId })
+
+        if (!answer) throw next({ message: "Failed to create answer" })
+
+        res.status(HTTP_STATUS_CODES.CREATED).json({
+            success: true,
+            message: "Answered successfully",
+            data: answer
+        })
+    }
+
+    public deleteProductQaController = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+        const { productId, qaId } = req.params
+        const authorId = req.user?.id
+
+        if (!authorId) throw next({ message: "Admin id is missing!!" })
+        if (!productId) throw next({ message: "Product id is missing!!" })
+        if (!qaId) throw next({ message: "Q&A id is missing!!" })
+
+        const qa = await this.services.productServices.deleteProductQa({ qaId, productId, authorId })
+
+        if (!qa) throw next({ message: "Failed to remove Q&A" })
+
+        res.status(HTTP_STATUS_CODES.CREATED).json({
+            success: true,
+            message: "Q&A removed successfully",
+            data: qa
+        })
+    }
 }
 export default AdminController
