@@ -3,7 +3,7 @@ import { Routes } from "../configs/interfaces/routes.interface";
 import middlewares from "../middlewares/middlewares";
 import tryCatchHandler from "../utils/tryCatchHandler";
 import AdminController from "../controllers/admin.controllers";
-import { AnswerToQuestionDto, AnswerToQuestionParamsDto, CreateProductDto, CreateProductQADto, CreateProductQAParamsDto, DeleteProductDto, DeleteReviewReplayDto, RemoveProductQaParamsDto, ReplayToProductReviewDto, UpdateOrderStatusDto, UpdateOrderStatusPramsDto, UpdateProductDto, UpdateProductQADto } from "../configs/dtos/request/admin.request.dto";
+import { AnswerToQuestionDto, AnswerToQuestionParamsDto, CreateProductDto, CreateProductQADto, CreateProductQAParamsDto, CreateProductVariantDto, CreateProductVariantParamsDto, DeleteProductDto, DeleteReviewReplayDto, RemoveProductQaParamsDto, ReplayToProductReviewDto, UpdateOrderStatusDto, UpdateOrderStatusPramsDto, UpdateProductDto, UpdateProductQADto, UpdateProductVariantDto, UpdateProductVariantParamsDto } from "../configs/dtos/request/admin.request.dto";
 import { UpdateProductReviewsParamsDto } from "../configs/dtos/request/user.request.dto";
 
 class AdminRoute extends AdminController implements Routes {
@@ -22,7 +22,6 @@ class AdminRoute extends AdminController implements Routes {
             this.middlewares.authMiddleware.validateAdminRole,
             tryCatchHandler(this.createPromotionController));
 
-
         this.router.post("/product/create",
             this.middlewares.authMiddleware.verifyToken,
             this.middlewares.authMiddleware.validateAdminRole,
@@ -40,6 +39,26 @@ class AdminRoute extends AdminController implements Routes {
             this.middlewares.authMiddleware.validateAdminRole,
             this.middlewares.validationMiddleware.paramsValidationMiddleware(DeleteProductDto),
             tryCatchHandler(this.deleteProductController));
+
+        this.router.post("/product/:productId/variant/create",
+            this.middlewares.authMiddleware.verifyToken,
+            this.middlewares.authMiddleware.validateAdminRole,
+            this.middlewares.validationMiddleware.paramsValidationMiddleware(CreateProductVariantParamsDto),
+            this.middlewares.validationMiddleware.bodyValidationMiddleware(CreateProductVariantDto),
+            tryCatchHandler(this.createProductVariantController));
+
+        this.router.patch("/product/:productId/variant/:variantId/update",
+            this.middlewares.authMiddleware.verifyToken,
+            this.middlewares.authMiddleware.validateAdminRole,
+            this.middlewares.validationMiddleware.paramsValidationMiddleware(UpdateProductVariantParamsDto),
+            this.middlewares.validationMiddleware.bodyValidationMiddleware(UpdateProductVariantDto),
+            tryCatchHandler(this.updateProductVariantController));
+
+        this.router.delete("/product/:productId/variant/:variantId/delete",
+            this.middlewares.authMiddleware.verifyToken,
+            this.middlewares.authMiddleware.validateAdminRole,
+            this.middlewares.validationMiddleware.paramsValidationMiddleware(UpdateProductVariantParamsDto),
+            tryCatchHandler(this.deleteProductVariantController));
 
         this.router.get("/order/:orderId/update",
             this.middlewares.authMiddleware.verifyToken,
@@ -85,13 +104,13 @@ class AdminRoute extends AdminController implements Routes {
             this.middlewares.validationMiddleware.bodyValidationMiddleware(AnswerToQuestionDto),
             tryCatchHandler(this.answerToQuestionController)
         )
+
         this.router.delete("/product/:productId/qa/:qaId/delete",
             this.middlewares.authMiddleware.verifyToken,
             this.middlewares.authMiddleware.validateAdminRole,
             this.middlewares.validationMiddleware.paramsValidationMiddleware(RemoveProductQaParamsDto),
             tryCatchHandler(this.deleteProductQaController)
         )
-
     }
 }
 

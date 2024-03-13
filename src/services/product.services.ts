@@ -1,23 +1,41 @@
-import { CreateProductDto, DeleteReviewReplayDto, UpdateProductDto } from "../configs/dtos/request/admin.request.dto";
+import { CreateProductDto, CreateProductVariantDto, DeleteReviewReplayDto, UpdateProductDto, UpdateProductVariantDto } from "../configs/dtos/request/admin.request.dto";
 import { AnswerToQuestionInterface, CreateProductQAInterface, CreateProductQuestionInterface, CreateReviewInterface, DeleteProductQaInterface, DeleteReviewReplayInterface, PaginationInterface, ReactionInterface, RemoveReviewInterface, ReplayToProductReviewInterface, UpdateProductQaInterface, UpdateReviewInterface } from "../configs/interfaces/common.interfaces";
 import prisma from "../prisma/prisma";
-import { PrismaClient, Reactions, ReviewTags } from "@prisma/client";
+import { ReviewTags } from "@prisma/client";
 
 class ProductServices {
 
-    public createProduct = async (product: CreateProductDto, vendorId: string) => {
+    public createProduct = async ({ variants, ...product }: CreateProductDto, vendorId: string) => {
         try {
+            return await prisma.$transaction(async (prisma) => {
+                await this.checkIsIdExist(
+                    product.categoryId,
+                    prisma.category,
+                    "Foreign key constraint error (categoryId doesn't exist)!!")
 
-            const validateCategoryId = await this.checkIsIdExist(
-                product.categoryId,
-                prisma.category,
-                "Foreign key constraint error (categoryId doesn't exist)!!")
-            if (validateCategoryId) return await prisma.product.create({ data: { ...product, vendorId } })
+                const newProduct = await prisma.product.create({
+                    data: {
+                        ...product,
+                        vendorId
+                    }
+                })
 
+                const formattedProducts = await Promise.resolve(
+                    variants.map((variant) => { return { ...variant, productId: newProduct.id } })
+                )
+
+                const newVariants = await prisma.productVariant.createMany({
+                    data: formattedProducts
+                })
+
+                if (!newVariants) return prisma.product.delete({ where: { id: newProduct.id } })
+
+                return newProduct
+            })
         } catch (error) {
             throw error
         }
-    };
+    }
 
     public updateProduct = async (product: UpdateProductDto, productId: string, vendorId: string) => {
         try {
@@ -28,9 +46,52 @@ class ProductServices {
                     "Foreign key constraint error (categoryId doesn't exist)!!");
             }
             return await prisma.product.update({
-                data: product, where: {
+                data: product,
+                where: {
                     id: productId,
                     vendorId
+                }
+            })
+        } catch (error) {
+            throw error
+        }
+    };
+
+    public createProductVariant = async ({ variant, productId, vendorId }: { variant: CreateProductVariantDto, productId: string, vendorId: string }) => {
+        try {
+            await this.checkIsVendorOfProduct(vendorId, productId);
+
+            return await prisma.productVariant.create({
+                data: { ...variant, productId }
+            })
+        } catch (error) {
+            throw error
+        }
+    };
+
+    public updateProductVariant = async ({ variant, variantId, productId, vendorId }: { variant: UpdateProductVariantDto, variantId: string, productId: string, vendorId: string }) => {
+        try {
+            await this.checkIsVendorOfProduct(vendorId, productId);
+
+            return await prisma.productVariant.update({
+                where: {
+                    id: variantId,
+                    productId
+                },
+                data: variant
+            })
+        } catch (error) {
+            throw error
+        }
+    };
+
+    public deleteProductVariant = async ({ variantId, productId, vendorId }: { variantId: string, productId: string, vendorId: string }) => {
+        try {
+            await this.checkIsVendorOfProduct(vendorId, productId);
+            return await prisma.productVariant.delete({
+                where: {
+                    id: variantId,
+                    productId,
                 }
             })
         } catch (error) {
@@ -43,6 +104,7 @@ class ProductServices {
             return await prisma.$transaction([prisma.product.count(), prisma.product.findMany({
                 skip: offset,
                 take: limit,
+                include: { variants: true }
             })])
 
         } catch (error) {
@@ -54,6 +116,7 @@ class ProductServices {
         try {
             return await prisma.product.findUnique({
                 where: { id: productId },
+                include: { variants: true }
             })
         } catch (error) {
             throw error
@@ -344,6 +407,7 @@ class ProductServices {
             throw error
         }
     }
+
     private checkIsIdExist = async (id: string, model: any, message: string) => {
         try {
             const isIdExist = await model.findUnique({ where: { id } })

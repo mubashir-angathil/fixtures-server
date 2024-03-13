@@ -20,9 +20,10 @@ class AdminController {
     public createProductController = async (req: RequestWithUser, res: Response, next: NextFunction) => {
         const vendorId = req.user?.id
 
-        if (!vendorId) throw next({ message: "authorId is missing!" })
+        if (!vendorId) throw next({ message: "AuthorId is missing!" })
 
         const product = await this.services.productServices.createProduct(req.body, vendorId)
+
         res.status(HTTP_STATUS_CODES.CREATED).json({
             success: true,
             message: "Product created successfully",
@@ -46,6 +47,56 @@ class AdminController {
             data: newProduct
         })
     };
+
+    public createProductVariantController = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+        const vendorId = req.user?.id
+        const productId = req.params?.productId
+
+        if (!vendorId) throw next({ message: "Author id is missing!" })
+        if (!productId) throw next({ message: "Product id is missing!" })
+
+        const productVariant = await this.services.productServices.createProductVariant({ variant: req.body, productId, vendorId })
+
+        res.status(HTTP_STATUS_CODES.CREATED).json({
+            success: true,
+            message: "Product variant creation successfully",
+            data: productVariant
+        });
+    };
+
+    public updateProductVariantController = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+        const vendorId = req.user?.id
+        const { productId, variantId } = req.params
+
+        if (!vendorId) throw next({ message: "Author id is missing!" })
+        if (!productId) throw next({ message: "Product id is missing!" })
+        if (!variantId) throw next({ message: "Variant id is missing!" })
+
+        const productVariant = await this.services.productServices.updateProductVariant({ variant: req.body, variantId, productId, vendorId })
+
+        res.status(HTTP_STATUS_CODES.OK).json({
+            success: true,
+            message: "Product variant updates successful",
+            data: productVariant
+        });
+    };
+
+    public deleteProductVariantController = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+        const vendorId = req.user?.id
+        const { productId, variantId } = req.params
+
+        if (!vendorId) throw next({ message: "Author id is missing!" })
+        if (!productId) throw next({ message: "Product id is missing!" })
+        if (!variantId) throw next({ message: "Variant id is missing!" })
+
+        const productVariant = await this.services.productServices.deleteProductVariant({ variantId, productId, vendorId })
+
+        res.status(HTTP_STATUS_CODES.OK).json({
+            success: true,
+            message: "Product variant deleted successfully",
+            data: productVariant
+        });
+    }
 
     public deleteProductController = async (req: RequestWithUser, res: Response, next: NextFunction) => {
         const vendorId = req.user?.id
@@ -155,7 +206,6 @@ class AdminController {
             data: qa
         })
     }
-
 
     public answerToQuestionController = async (req: RequestWithUser, res: Response, next: NextFunction) => {
         const { productId, qaId } = req.params

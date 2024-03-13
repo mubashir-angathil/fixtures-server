@@ -1,5 +1,5 @@
 import { $Enums, Color, Photo, Product, Size, Status } from "@prisma/client";
-import { IsArray, IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, MaxLength, MinLength, isString } from "class-validator"
+import { IsArray, IsEnum, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength, Min, MinLength, isString } from "class-validator"
 import { CancelOrderDto, UpdateProductReviewsParamsDto } from "./user.request.dto";
 
 export class CreateProductDto {
@@ -11,96 +11,50 @@ export class CreateProductDto {
     @IsNotEmpty()
     description: string;
 
-    @IsInt()
-    @IsNotEmpty()
-    quantity: number
-
-    @IsInt()
-    @IsNotEmpty()
-    price: Product['price'];
-
-    @IsArray()
-    @IsNotEmpty()
-    photos: Photo[];
-
     @IsString()
     @IsNotEmpty()
     categoryId: string;
 
-    @IsArray()
-    @IsNotEmpty()
-    colors: $Enums.Color[]
+    @IsNumber()
+    @Min(1)
+    commonPrice: number
 
     @IsArray()
     @IsNotEmpty()
-    sizes: $Enums.Size[]
+    variants: CreateProductVariantDto[]
 
     constructor(
         name: string,
         description: string,
-        price: number,
-        quantity: number,
-        photos: Photo[],
         categoryId: string,
-        colors: $Enums.Color[],
-        sizes: $Enums.Size[]
+        commonPrice: number,
+        variants: CreateProductVariantDto[]
     ) {
         this.name = name;
         this.description = description;
-        this.price = price;
-        this.quantity = quantity
-        this.photos = photos;
         this.categoryId = categoryId
-        this.colors = colors
-        this.sizes = sizes
+        this.commonPrice = commonPrice
+        this.variants = variants
     }
 }
 
 export class UpdateProductDto {
     @IsString()
     @IsOptional()
-    name: string;
+    name?: string;
 
     @IsString()
     @IsOptional()
-    description: string;
-
-    @IsInt()
-    @IsOptional()
-    price: Product['price'];
-
-    @IsInt()
-    @IsOptional()
-    quantity: number
+    description?: string;
 
     @IsString()
     @IsOptional()
-    categoryId: string;
+    categoryId?: string;
 
-    @IsArray()
+    @IsNumber()
+    @Min(1)
     @IsOptional()
-    photos: Photo[];
-
-    @IsArray()
-    @IsOptional()
-    @IsEnum(Color)
-    colors: Color[]
-
-    @IsArray()
-    @IsOptional()
-    @IsEnum(Size)
-    sizes: Size[]
-
-    constructor(name: string, description: string, price: number, quantity: number, photos: Photo[], categoryId: string, colors: $Enums.Color[], sizes: $Enums.Size[]) {
-        this.name = name;
-        this.description = description;
-        this.price = price;
-        this.quantity = quantity;
-        this.categoryId = categoryId
-        this.photos = photos;
-        this.colors = colors;
-        this.sizes = sizes;
-    }
+    commonPrice?: number
 }
 
 export class DeleteProductDto {
@@ -111,6 +65,61 @@ export class DeleteProductDto {
     constructor(productId: string) {
         this.productId = productId
     }
+}
+
+export class CreateProductVariantDto {
+
+    @IsNumber()
+    @Min(1)
+    @IsOptional()
+    optionalPrice?: number;
+
+    @IsInt()
+    @Min(1)
+    quantity: number
+
+    @IsArray()
+    @IsNotEmpty()
+    photos: Photo[];
+
+    @IsNotEmpty()
+    @IsEnum(Color)
+    color: Color
+
+    @IsNotEmpty()
+    @IsEnum(Size)
+    size: Size
+
+    constructor(quantity: number, photos: Photo[], color: Color, size: Size) {
+        this.quantity = quantity
+        this.photos = photos
+        this.color = color
+        this.size = size
+    }
+}
+
+export class UpdateProductVariantDto {
+
+    @IsNumber()
+    @Min(1)
+    @IsOptional()
+    optionalPrice?: number;
+
+    @IsInt()
+    @IsOptional()
+    quantity?: number
+
+    @IsArray()
+    @IsOptional()
+    photos?: Photo[];
+
+    @IsOptional()
+    @IsEnum(Color)
+    color?: Color
+
+    @IsOptional()
+    @IsEnum(Size)
+    size?: Size
 }
 
 export class UpdateOrderStatusDto {
@@ -200,3 +209,23 @@ export class AnswerToQuestionParamsDto extends CreateProductQAParamsDto {
 }
 
 export class RemoveProductQaParamsDto extends AnswerToQuestionParamsDto { }
+
+export class CreateProductVariantParamsDto {
+    @IsString()
+    @IsNotEmpty()
+    productId: string
+
+    constructor(productId: string) {
+        this.productId = productId
+    }
+}
+export class UpdateProductVariantParamsDto extends CreateProductVariantParamsDto {
+    @IsString()
+    @IsNotEmpty()
+    variantId: string
+
+    constructor(productId: string, variantId: string) {
+        super(productId)
+        this.variantId = variantId
+    }
+}

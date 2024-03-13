@@ -2,7 +2,7 @@ import { $Enums, Reactions, Roles } from "@prisma/client";
 import { Request } from "express";
 import { CreateUserInterface } from "./auth.interface";
 import { CreateUserDto } from "../dtos/response/auth.request.dto";
-import { CreateAddressDto, CreateProductQuestionDto, CreateReviewDto, PlaceOrderItemType, UpdateAddressDto, UpdateProductReviewsDto } from "../dtos/request/user.request.dto";
+import { AddProductToCartDto, CreateAddressDto, CreateProductQuestionDto, CreateReviewDto, PlaceOrderItemType, UpdateAddressDto, UpdateProductReviewsDto } from "../dtos/request/user.request.dto";
 import { AnswerToQuestionDto, CreateProductQADto, RemoveProductQaParamsDto, ReplayToProductReviewDto, UpdateProductQADto } from "../dtos/request/admin.request.dto";
 
 export interface DoSignUpInterface extends CreateUserDto {
@@ -81,4 +81,8 @@ export interface UpdateProductQaInterface extends UpdateProductQADto {
     qaId: string
     productId: string
     authorId: string
+}
+
+export interface AddProductToCartInterface extends AddProductToCartDto {
+    userId: string
 }

@@ -1,4 +1,4 @@
-import { Color, Size, AddressType, Reactions } from "@prisma/client";
+import { AddressType } from "@prisma/client";
 import { IsArray, IsEnum, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, Min, Max, MinLength } from "class-validator";
 
 export class AddProductToCartDto {
@@ -6,12 +6,17 @@ export class AddProductToCartDto {
     @IsNotEmpty()
     productId: string
 
+    @IsString()
+    @IsNotEmpty()
+    variantId: string
+
     @IsNumber()
     @IsNotEmpty()
     quantity: number
 
-    constructor(productId: string, quantity: number) {
+    constructor(productId: string, quantity: number, variantId: string) {
         this.productId = productId
+        this.variantId = variantId
         this.quantity = quantity
     }
 }
@@ -25,18 +30,17 @@ export class RemoveProductFromCartDto {
     @IsNotEmpty()
     productId: string
 
+    @IsString()
+    @IsNotEmpty()
+    variantId: string
 
-    constructor(cartId: string, productId: string) {
+    constructor(cartId: string, productId: string, variantId: string) {
         this.cartId = cartId
         this.productId = productId
+        this.variantId = variantId
     }
 }
 export class PlaceOrderDto {
-
-    @IsNumber()
-    @IsNotEmpty()
-    totalAmount: number
-
     @IsString()
     @IsNotEmpty()
     addressId: string
@@ -46,18 +50,21 @@ export class PlaceOrderDto {
     items: PlaceOrderItemType[]
 
 
-    constructor(totalAmount: number, addressId: string, items: PlaceOrderItemType[]) {
+    constructor(addressId: string, items: PlaceOrderItemType[]) {
         this.addressId = addressId;
-        this.totalAmount = totalAmount;
         this.items = items
     }
 }
 
+export class PlaceOrderQueryDto {
+    @IsString()
+    @IsOptional()
+    cartId?: string
+}
 
 export type PlaceOrderItemType = {
     productId: string
-    color: Color
-    size: Size
+    variantId: string
     quantity: number
     unitPrice: number
     promotionCode?: string
@@ -282,6 +289,7 @@ export class UpdateProductReviewsParamsDto {
 }
 
 export class CreateProductQuestionParamsDto extends CreateProductReviewsParamsDto { }
+
 export class CreateProductAnswerParamsDto extends CreateProductReviewsParamsDto { }
 export class CreateProductQuestionDto {
     @IsString()

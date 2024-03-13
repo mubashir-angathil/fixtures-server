@@ -3,7 +3,7 @@ import { Routes } from "../configs/interfaces/routes.interface";
 import middlewares from "../middlewares/middlewares";
 import tryCatchHandler from "../utils/tryCatchHandler";
 import UserController from "../controllers/user.controllers";
-import { AddProductToCartDto, CancelOrderDto, CreateAddressDto, CreateProductQuestionDto, CreateProductQuestionParamsDto, CreateProductReviewsDto, CreateProductReviewsParamsDto, PlaceOrderDto, RemoveProductFromCartDto, UpdateAddressDto, UpdateAddressParamsDto, UpdateProductReviewsDto, UpdateProductReviewsParamsDto } from "../configs/dtos/request/user.request.dto";
+import { AddProductToCartDto, CancelOrderDto, CreateAddressDto, CreateProductQuestionDto, CreateProductQuestionParamsDto, CreateProductReviewsDto, CreateProductReviewsParamsDto, PlaceOrderDto, PlaceOrderQueryDto, RemoveProductFromCartDto, UpdateAddressDto, UpdateAddressParamsDto, UpdateProductReviewsDto, UpdateProductReviewsParamsDto } from "../configs/dtos/request/user.request.dto";
 
 class UserRoute extends UserController implements Routes {
     path?: string = "/user"
@@ -30,7 +30,7 @@ class UserRoute extends UserController implements Routes {
             tryCatchHandler(this.addProductToCartController));
 
         this.router.delete(
-            "/cart/:cartId/product/:productId/delete",
+            "/cart/:cartId/product/:productId/variant/:variantId/delete",
             this.middlewares.authMiddleware.verifyToken,
             this.middlewares.authMiddleware.validateUserRole,
             this.middlewares.validationMiddleware.paramsValidationMiddleware(RemoveProductFromCartDto),
@@ -40,6 +40,7 @@ class UserRoute extends UserController implements Routes {
             "/order/place",
             this.middlewares.authMiddleware.verifyToken,
             this.middlewares.authMiddleware.validateUserRole,
+            this.middlewares.validationMiddleware.queryValidationMiddleware(PlaceOrderQueryDto),
             this.middlewares.validationMiddleware.bodyValidationMiddleware(PlaceOrderDto),
             tryCatchHandler(this.placeOrderController)
         );

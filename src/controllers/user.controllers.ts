@@ -26,9 +26,13 @@ class UserController {
     };
 
     public removeProductFromCartController = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+
+        const { productId, cartId, variantId } = req.params
+
         const cart = await this.services.userServices.removeProductFromCart({
-            productId: req.params.productId,
-            cartId: req.params.cartId
+            productId,
+            cartId,
+            variantId
         })
 
         if (!cart) throw next({ message: "Operation Failed!!, Failed to remove product from cart" })
@@ -57,9 +61,11 @@ class UserController {
 
     public placeOrderController = async (req: RequestWithUser, res: Response, next: NextFunction) => {
         const userId = req.user?.id
+        const cartId = req.query?.cartId ? req.query?.cartId.toString() : undefined
 
         if (!userId) throw next({ message: "User id is missing!" })
-        const order = await this.services.userServices.placeOrder({ data: req.body, userId })
+
+        const order = await this.services.userServices.placeOrder({ data: req.body, userId, cartId })
 
         if (!order) throw next({ message: "Oops!! Order creation failed, try agin" })
 
